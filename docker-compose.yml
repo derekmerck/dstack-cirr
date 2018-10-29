@@ -55,7 +55,7 @@ services:
       - orthanc_data:/var/lib/orthanc/db
     environment:
       ORTHANC_AET:         CIRR1
-      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_REMOTE_PASSWORD}
+      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
       ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
       ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
       ORTHANC_PG_HOST:     postgres

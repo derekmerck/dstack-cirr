@@ -11,8 +11,8 @@ Providence, RI
 Set your environment vars (with `.env`, for example)
 
 ```bash
-$ docker-compose -f setup.yml up  # Creates proxy and portainer
+$ docker-compose -f setup.docker-compose.yml up  # Creates proxy and portainer
 $ docker-compose up
 ```
 
-Alternatively, you can log into Portainer and add the stack template "RIH-CIRR"
+Alternatively, you can log into Portainer and add the stack template "RIH-CIRR".

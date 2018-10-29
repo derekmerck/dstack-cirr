@@ -1,0 +1,26 @@
+{
+  "type": 3,
+  "title": "RIH CIRR",
+  "description": "Rhode Island Hospital Clinical Imaging Research Registry Stack",
+  "categories": ["medical"],
+  "platform": "linux",
+  "repository": {
+    "url": "https://github.com/derekmerck/dstack-cirr",
+    "stackfile": "docker-compose.yml"
+  },
+    "env": [
+      {"name": "DATA_DIR",
+        "label": "Host data directory",
+        "default": "/data"},
+      {"name": "ORTHANC_PASSWORD",
+        "label": "Orthanc password",
+        "default": "passw0rd!"},
+      {"name": "ORTHANC_PG_DATABASE",
+        "label": "Postgres database name",
+        "default": "orthanc"},
+      {"name": "POSTGRES_PASSWORD",
+        "label": "Postgres password",
+        "default": "passw0rd!"}
+      ]
+
+}
