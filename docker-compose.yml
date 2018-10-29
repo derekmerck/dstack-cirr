@@ -59,8 +59,7 @@ services:
     volumes:
       - orthanc_data:/var/lib/orthanc/db
     environment:
-      # ORTHANC_CONF_SOURCE:  [env (default), consul:abc, redis:abc]
-      ORTHANC_REMOTE_PASSWORD: ${SERVICE_CREDENTIALS_PASSWORD}
+      ORTHANC_REMOTE_PASSWORD: ${SERVICE_REMOTE_PASSWORD}
       ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
       ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
       ORTHANC_PG_HOST:     postgres
@@ -72,4 +71,25 @@ services:
       - "traefik.port=8042"
       - "traefik.frontend.rule=PathPrefixStrip:/orthanc/"
 
+
+  # This is a DICOM Q/R bridge, so expose ports and don't scale
+  orthanc-connect:
+    image: derekmerck/orthanc-confd:latest-amd64
+    ports:
+      - "4242:4242"
+    volumes:
+      - orthanc_data:/var/lib/orthanc/db
+    environment:
+      ORTHANC_AET:         CIRR1
+      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_REMOTE_PASSWORD}
+      ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
+      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
+      ORTHANC_PG_HOST:     postgres
+      ORTHANC_PG_USER:     orthanc
+      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
+      ORTHANC_VERBOSE:     "true"
+      TZ: "America/New_York"
+    labels:
+      - "traefik.port=8042"
+      - "traefik.frontend.rule=PathPrefixStrip:/orthanc-connect/"
 
