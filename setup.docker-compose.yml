@@ -24,7 +24,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:rw
       - portainer_data:/data:rw
-      - portainer_templates.json:/templates.json:ro
+      - ./portainer_templates.json:/templates.json:ro
     environment:
       TZ: "America/New_York"
     labels:
