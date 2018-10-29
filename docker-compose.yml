@@ -4,6 +4,10 @@ volumes:
   splunk_data:
   portainer_data:
   pg_data:
+    driver_opts:
+        type: none
+        device: ${DATA_DIR}/pgdata
+        o: bind
   orthanc_data:
 
 services:
