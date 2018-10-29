@@ -1,7 +1,6 @@
 version: '2'
 
 volumes:
-  portainer_data:
   pg_data:
     driver_opts:
         type: none
@@ -15,33 +14,6 @@ volumes:
 
 
 services:
-
-  reverse-proxy:
-    image: traefik
-    command: --api --docker
-    ports:
-      - "80:80"
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      TZ: "America/New_York"
-
-
-  portainer:
-    image: portainer/portainer
-    command: --no-auth
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    environment:
-      TZ: "America/New_York"
-    labels:
-      - "traefik.port=9000"
-      - "traefik.frontend.redirect.regex=^(.*)/portainer$$"
-      - "traefik.frontend.redirect.replacement=$$1/portainer/"
-      - "traefik.frontend.rule=PathPrefix:/portainer;ReplacePathRegex: ^/portainer/(.*) /$$1"
-
 
   postgres:
     image: postgres
@@ -70,6 +42,8 @@ services:
     labels:
       - "traefik.port=8042"
       - "traefik.frontend.rule=PathPrefixStrip:/orthanc/"
+    depends_on:
+      - postgres
 
 
   # This is a DICOM Q/R bridge, so expose ports and don't scale
@@ -92,4 +66,6 @@ services:
     labels:
       - "traefik.port=8042"
       - "traefik.frontend.rule=PathPrefixStrip:/orthanc-connect/"
+    depends_on:
+    - postgres
 
