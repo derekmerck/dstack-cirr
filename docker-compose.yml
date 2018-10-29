@@ -48,7 +48,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: ${SERVICE_CREDENTIALS_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
 
 
