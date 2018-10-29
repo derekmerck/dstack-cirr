@@ -1,14 +1,18 @@
 version: '2'
 
 volumes:
-  splunk_data:
   portainer_data:
   pg_data:
     driver_opts:
         type: none
-        device: ${DATA_DIR}/pgdata
+        device: ${DATA_DIR}/postgres
         o: bind
   orthanc_data:
+    driver_opts:
+        type: none
+        device: ${DATA_DIR}/orthanc
+        o: bind
+
 
 services:
 
@@ -22,27 +26,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       TZ: "America/New_York"
-
-
-  splunk:
-    image: splunk/splunk
-    # build:
-    #   context:
-    #     splunk-confd
-    #   args:
-    #     SPLUNK_LOGGING_TOK: ${SPLUNK_LOGGING_TOKEN}
-    #     SPLUNK_REMOTES_TOK: ${SPLUNK_REMOTES_TOKEN}
-    #     SPLUNK_DICOM_TOK:   ${SPLUNK_DICOM_TOKEN}
-    ports:
-      - "8088:8088"
-      - "8089:8089"
-    environment:
-      SPLUNK_START_ARGS: '--accept-license --seed-passwd ${SERVICE_CREDENTIALS_PASSWORD}'
-      SPLUNK_USER:  root
-      TZ: "America/New_York"
-    labels:
-      - "traefik.port:8000"
-      - "traefik.frontend.rule=PathPrefixStrip:/splunk/"
 
 
   portainer:
@@ -69,16 +52,10 @@ services:
       TZ: "America/New_York"
 
 
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
-
-
   orthanc:
-    image: orthanc-confd-amd64
-    ports:
-      - "4242"  # Expose DICOM ingress, can't scale though
+    image: derekmerck/orthanc-confd:latest-amd64
+    # ports:
+    #  - "4242"  # Expose DICOM ingress, can't scale though
     volumes:
       - orthanc_data:/var/lib/orthanc/db
     environment:
@@ -94,28 +71,4 @@ services:
       - "traefik.port=8042"
       - "traefik.frontend.rule=PathPrefixStrip:/orthanc/"
 
-
-
-
-
-  # rabitmq:
-  #   image: rabitmq
-
-
-  # diana-watcher:
-  #   image: derekmerck/diana
-  #   command: diana-watcher
-
-
-  # diana-worker:
-  #   image: derekmerck/diana
-  #   command: diana-worker
-
-
-
-    # logging:
-    #   driver: splunk
-    #   options:
-    #     splunk-token: ${SPLUNK_LOGGING_TOK}
-    #     splunk-url:   ${SPLUNK_HEC_URL}
 
