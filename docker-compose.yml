@@ -63,7 +63,7 @@ services:
       ORTHANC_REMOTE_PASSWORD: ${SERVICE_CREDENTIALS_PASSWORD}
       ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
       ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
-      ORTHANC_PG_HOST:     dstackscirr_postgres_1
+      ORTHANC_PG_HOST:     postgres
       ORTHANC_PG_USER:     orthanc
       ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
       ORTHANC_VERBOSE:     "true"
