@@ -48,6 +48,7 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     environment:
+      POSTGRES_USER:     orthanc
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
 
