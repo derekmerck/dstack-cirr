@@ -31,7 +31,7 @@ services:
     volumes:
       - orthanc_data:/var/lib/orthanc/db
     environment:
-      ORTHANC_REMOTE_PASSWORD: ${SERVICE_REMOTE_PASSWORD}
+      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
       ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
       ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
       ORTHANC_PG_HOST:     postgres
@@ -50,6 +50,7 @@ services:
   orthanc-connect:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
+      - "8042:8042"
       - "4242:4242"
     volumes:
       - orthanc_data:/var/lib/orthanc/db
