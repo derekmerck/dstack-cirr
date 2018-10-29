@@ -1,4 +1,4 @@
-version: '2.2'
+version: '2'
 
 volumes:
   portainer_data:
@@ -55,7 +55,6 @@ services:
   # Want to be able to scale this, so don't expose DICOM ports
   orthanc:
     image: derekmerck/orthanc-confd:latest-amd64
-    scale: 3
     volumes:
       - orthanc_data:/var/lib/orthanc/db
     environment:
