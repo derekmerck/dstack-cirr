@@ -68,5 +68,5 @@ services:
       - "traefik.port=8042"
       - "traefik.frontend.rule=PathPrefixStrip:/orthanc-connect/"
     depends_on:
-    - postgres
+      - postgres
 

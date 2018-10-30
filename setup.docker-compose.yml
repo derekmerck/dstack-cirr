@@ -6,6 +6,7 @@ volumes:
 
 
 services:
+
   reverse-proxy:
     image: traefik
     command: --api --docker
@@ -32,4 +33,22 @@ services:
       - "traefik.frontend.redirect.regex=^(.*)/portainer$$"
       - "traefik.frontend.redirect.replacement=$$1/portainer/"
       - "traefik.frontend.rule=PathPrefix:/portainer;ReplacePathRegex: ^/portainer/(.*) /$$1"
+
+
+#  splunk:
+#    image: splunk/splunk
+#    ports:
+#    - "8088:8088"
+#    - "8089:8089"
+#    environment:
+#      SPLUNK_START_ARGS: '--accept-license --seed-passwd ${SERVICE_CREDENTIALS_PASSWORD}'
+#      SPLUNK_USER:  root
+#      TZ: "America/New_York"
+#    labels:
+#    - "traefik.port:8000"
+#    - "traefik.frontend.rule=PathPrefixStrip:/splunk/"
+#  deploy:
+#    placement:
+#      constraints:
+#      - node.labels.role == bridge
 
