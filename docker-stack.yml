@@ -127,4 +127,8 @@ services:
       - "traefik.frontend.rule=PathPrefixStrip:/orthanc-connect/"
     depends_on:
       - postgres
+    deploy:
+      placement:
+        constraints:
+          - node.labels.storage==true
 
