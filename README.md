@@ -25,7 +25,8 @@ $ ssh host2
 2. Tag the storage node
 
 ```bash
-$ docker node update --label-add storage host1
+$ docker node update --label-add storage=true host1
+$ docker node update --label-add storage_dir=/data host1
 ```
 
 2. Add the Portainer agent
