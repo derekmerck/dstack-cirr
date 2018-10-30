@@ -4,12 +4,12 @@ volumes:
   pg_data:
     driver_opts:
         type: none
-        device: ${DATA_DIR}/postgres/data
+        device: /data/postgres/data
         o: bind
   orthanc_data:
     driver_opts:
         type: none
-        device: ${DATA_DIR}/orthanc/db
+        device: /data/orthanc/db
         o: bind
 
 
@@ -69,7 +69,7 @@ services:
       - pg_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER:     orthanc
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: password
       TZ: "America/New_York"
     deploy:
       placement:
@@ -114,12 +114,12 @@ services:
       - orthanc_data:/var/lib/orthanc/db
     environment:
       ORTHANC_AET:         CIRR1
-      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
+      ORTHANC_REMOTE_PASSWORD: orthanc
       ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
-      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
+      ORTHANC_PG_DATABASE: orthanc
       ORTHANC_PG_HOST:     postgres
       ORTHANC_PG_USER:     orthanc
-      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
+      ORTHANC_PG_PASSWORD: password
       ORTHANC_VERBOSE:     "true"
       TZ: "America/New_York"
     labels:
