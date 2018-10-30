@@ -69,7 +69,7 @@ services:
       - pg_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER:     orthanc
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
     deploy:
       placement:
@@ -77,30 +77,30 @@ services:
           - node.labels.storage==true
 
 
-#  # Want to be able to scale this, so don't expose DICOM ports
-#  orthanc:
-#    image: derekmerck/orthanc-confd:latest-amd64
-#    volumes:
-#      - orthanc_data:/var/lib/orthanc/db
-#    environment:
-#      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
-#      ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
-#      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
-#      ORTHANC_PG_HOST:     postgres
-#      ORTHANC_PG_USER:     orthanc
-#      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
-#      ORTHANC_VERBOSE:     "true"
-#      TZ: "America/New_York"
-#    labels:
-#      - "traefik.port=8042"
-#      - "traefik.frontend.rule=PathPrefixStrip:/orthanc/"
-#    depends_on:
-#      - postgres
-#    deploy:
-#      replicas: 3
-#      placement:
-#        constraints:
-#        - node.labels.storage==true
+  # Want to be able to scale this, so don't expose DICOM ports
+  orthanc:
+    image: derekmerck/orthanc-confd:latest-amd64
+    volumes:
+      - orthanc_data:/var/lib/orthanc/db
+    environment:
+      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
+      ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
+      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
+      ORTHANC_PG_HOST:     postgres
+      ORTHANC_PG_USER:     orthanc
+      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
+      ORTHANC_VERBOSE:     "true"
+      TZ: "America/New_York"
+    labels:
+      - "traefik.port=8042"
+      - "traefik.frontend.rule=PathPrefixStrip:/orthanc/"
+    depends_on:
+      - postgres
+    deploy:
+      replicas: 3
+      placement:
+        constraints:
+        - node.labels.storage==true
 
 
 
@@ -114,12 +114,12 @@ services:
       - orthanc_data:/var/lib/orthanc/db
     environment:
       ORTHANC_AET:         CIRR1
-      ORTHANC_REMOTE_PASSWORD: orthanc
+      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
       ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
-      ORTHANC_PG_DATABASE: orthanc
+      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
       ORTHANC_PG_HOST:     postgres
       ORTHANC_PG_USER:     orthanc
-      ORTHANC_PG_PASSWORD: password
+      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
       ORTHANC_VERBOSE:     "true"
       TZ: "America/New_York"
     labels:
