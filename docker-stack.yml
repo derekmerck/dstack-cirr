@@ -15,52 +15,52 @@ volumes:
 
 services:
 
-  archive-queue:
-    image: derekmerck/orthanc-confd:latest-amd64
-    environment:
-      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
-      ORTHANC_MAX_PATIENTS:    100
-
-      ORTHANC_PEERDEST_0:      cirr1
-
-      ORHTANC_PEERS_0_ADDR:    http://orthanc:${ORTHANC_PASSWORD}@cirr1/orthanc/
-
-      ORTHANC_VERBOSE:         "true"
-      TZ: "America/New_York"
-    labels:
-      - "traefik.port=8042"
-      - "traefik.frontend.rule=PathPrefixStrip:/archive-queue/"
-    deploy:
-      placement:
-        constraints:
-          - node.labels.role == bridge
-
-
-  terarecon-mux:
-    image: derekmerck/orthanc-confd:latest-amd64
-    environment:
-      ORTHANC_REMOTE_PASSWORD:  ${ORTHANC_PASSWORD}
-      ORTHANC_MAX_PATIENTS:     100
-
-      ORTHANC_PEER_DEST0:      cirr1
-      ORTHANC_MOD_DEST0:       terarecon
-
-      ORTHANC_PEERS0_NAME:     cirr1
-      ORHTANC_PEERS0_ADDR:     http://orthanc:${ORTHANC_PASSWORD}@cirr1/orthanc/
-
-      ORTHANC_MOD0_NAME:       terarecon
-      ORHTANC_MOD0_ADDR:       dcm:TERARECON@10.200.300.10:4242
-
-
-      ORTHANC_VERBOSE:         "true"
-      TZ: "America/New_York"
-    labels:
-      - "traefik.port=8042"
-      - "traefik.frontend.rule=PathPrefixStrip:/terarecon-mux/"
+#  archive-queue:
+#    image: derekmerck/orthanc-confd:latest-amd64
+#    environment:
+#      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
+#      ORTHANC_MAX_PATIENTS:    100
+#
+#      ORTHANC_PEERDEST_0:      cirr1
+#
+#      ORHTANC_PEERS_0_ADDR:    http://orthanc:${ORTHANC_PASSWORD}@cirr1/orthanc/
+#
+#      ORTHANC_VERBOSE:         "true"
+#      TZ: "America/New_York"
+#    labels:
+#      - "traefik.port=8042"
+#      - "traefik.frontend.rule=PathPrefixStrip:/archive-queue/"
 #    deploy:
 #      placement:
-#        preferences:
-#          - node.labels.ingress
+#        constraints:
+#          - node.labels.role == bridge
+#
+#
+#  terarecon-mux:
+#    image: derekmerck/orthanc-confd:latest-amd64
+#    environment:
+#      ORTHANC_REMOTE_PASSWORD:  ${ORTHANC_PASSWORD}
+#      ORTHANC_MAX_PATIENTS:     100
+#
+#      ORTHANC_PEER_DEST0:      cirr1
+#      ORTHANC_MOD_DEST0:       terarecon
+#
+#      ORTHANC_PEERS0_NAME:     cirr1
+#      ORHTANC_PEERS0_ADDR:     http://orthanc:${ORTHANC_PASSWORD}@cirr1/orthanc/
+#
+#      ORTHANC_MOD0_NAME:       terarecon
+#      ORHTANC_MOD0_ADDR:       dcm:TERARECON@10.200.300.10:4242
+#
+#
+#      ORTHANC_VERBOSE:         "true"
+#      TZ: "America/New_York"
+#    labels:
+#      - "traefik.port=8042"
+#      - "traefik.frontend.rule=PathPrefixStrip:/terarecon-mux/"
+##    deploy:
+##      placement:
+##        preferences:
+##          - node.labels.ingress
 
 
   postgres:
@@ -74,33 +74,33 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.storage
+          - node.labels.storage==true
 
 
-  # Want to be able to scale this, so don't expose DICOM ports
-  orthanc:
-    image: derekmerck/orthanc-confd:latest-amd64
-    volumes:
-      - orthanc_data:/var/lib/orthanc/db
-    environment:
-      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
-      ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
-      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
-      ORTHANC_PG_HOST:     postgres
-      ORTHANC_PG_USER:     orthanc
-      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
-      ORTHANC_VERBOSE:     "true"
-      TZ: "America/New_York"
-    labels:
-      - "traefik.port=8042"
-      - "traefik.frontend.rule=PathPrefixStrip:/orthanc/"
-    depends_on:
-      - postgres
-    deploy:
-      replicas: 3
-      placement:
-        constraints:
-        - node.labels.role == storage
+#  # Want to be able to scale this, so don't expose DICOM ports
+#  orthanc:
+#    image: derekmerck/orthanc-confd:latest-amd64
+#    volumes:
+#      - orthanc_data:/var/lib/orthanc/db
+#    environment:
+#      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
+#      ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
+#      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
+#      ORTHANC_PG_HOST:     postgres
+#      ORTHANC_PG_USER:     orthanc
+#      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
+#      ORTHANC_VERBOSE:     "true"
+#      TZ: "America/New_York"
+#    labels:
+#      - "traefik.port=8042"
+#      - "traefik.frontend.rule=PathPrefixStrip:/orthanc/"
+#    depends_on:
+#      - postgres
+#    deploy:
+#      replicas: 3
+#      placement:
+#        constraints:
+#        - node.labels.storage==true
 
 
 
