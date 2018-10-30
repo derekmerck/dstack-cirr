@@ -4,12 +4,12 @@ volumes:
   pg_data:
     driver_opts:
         type: none
-        device: {{.Node.storage_dir}}/postgres/data
+        device: {{ .Node.storage_dir "/data" }}/postgres/data
         o: bind
   orthanc_data:
     driver_opts:
         type: none
-        device: {{.Node.storage_dir}}/orthanc/db
+        device: {{ .Node.storage_dir  "/data" }}/orthanc/db
         o: bind
 
 
