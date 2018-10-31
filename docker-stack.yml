@@ -81,9 +81,9 @@ services:
   orthanc:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
-      - 4242:4242
-      - 8042:8042
-#    volumes:
+      - 4212:4242
+      - 4280:8042
+#    volumes:s
 #      - orthanc_data:/var/lib/orthanc/db
     environment:
       ORTHANC_PASSWORD: ${ORTHANC_PASSWORD}
