@@ -4,12 +4,12 @@ volumes:
   pg_data:
     driver_opts:
         type: none
-        device: /data/postgres/data
+        device: ${DATA_DIR}/postgres/data
         o: bind
   orthanc_data:
     driver_opts:
         type: none
-        device: /data/orthanc/db
+        device: ${DATA_DIR}/data/orthanc/db
         o: bind
 
 
@@ -63,72 +63,74 @@ services:
 ##          - node.labels.ingress
 
 
-  postgres:
-    image: postgres
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER:     orthanc
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      TZ: "America/New_York"
-    deploy:
-      placement:
-        constraints:
-          - node.labels.storage==true
+#  postgres:
+#    image: postgres
+#    volumes:
+#      - pg_data:/var/lib/postgresql/data
+#    environment:
+#      POSTGRES_USER:     orthanc
+#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#      TZ: "America/New_York"
+#    deploy:
+#      placement:
+#        constraints:
+#          - node.labels.storage==true
 
 
   # Want to be able to scale this, so don't expose DICOM ports
   orthanc:
     image: derekmerck/orthanc-confd:latest-amd64
-    volumes:
-      - orthanc_data:/var/lib/orthanc/db
-    environment:
-      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
-      ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
-      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
-      ORTHANC_PG_HOST:     postgres
-      ORTHANC_PG_USER:     orthanc
-      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
-      ORTHANC_VERBOSE:     "true"
-      TZ: "America/New_York"
-    labels:
-      - "traefik.port=8042"
-      - "traefik.frontend.rule=PathPrefixStrip:/orthanc/"
-    depends_on:
-      - postgres
-    deploy:
-      replicas: 3
-      placement:
-        constraints:
-        - node.labels.storage==true
-
-
-
-  # This is a DICOM Q/R bridge, so expose ports and don't scale
-  orthanc-connect:
-    image: derekmerck/orthanc-confd:latest-amd64
     ports:
-      - "8042:8042"
-      - "4242:4242"
+      - 4242:4242
     volumes:
       - orthanc_data:/var/lib/orthanc/db
     environment:
-      ORTHANC_AET:         CIRR1
       ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
-      ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
-      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
-      ORTHANC_PG_HOST:     postgres
-      ORTHANC_PG_USER:     orthanc
-      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
+#      ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
+#      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
+#      ORTHANC_PG_HOST:     postgres
+#      ORTHANC_PG_USER:     orthanc
+#      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
       ORTHANC_VERBOSE:     "true"
       TZ: "America/New_York"
-    labels:
-      - "traefik.port=8042"
-      - "traefik.frontend.rule=PathPrefixStrip:/orthanc-connect/"
-    depends_on:
-      - postgres
+#    labels:
+#      - "traefik.port=8042"
+#      - "traefik.frontend.rule=PathPrefixStrip:/orthanc/"
+#    depends_on:
+#      - postgres
     deploy:
-      placement:
-        constraints:
-          - node.labels.storage==true
+      replicas: 1
+#      placement:
+#        constraints:
+#        - node.labels.storage==true
+
+
+
+#  # This is a DICOM Q/R bridge, so expose ports and don't scale
+#  orthanc-connect:
+#    image: derekmerck/orthanc-confd:latest-amd64
+#    ports:
+#      - "8042:8042"
+#      - "4242:4242"
+#    volumes:
+#      - orthanc_data:/var/lib/orthanc/db
+#    environment:
+#      ORTHANC_AET:         CIRR1
+#      ORTHANC_REMOTE_PASSWORD: ${ORTHANC_PASSWORD}
+#      ORTHANC_PG_ENABLED:  "true"  # must be lowercase!
+#      ORTHANC_PG_DATABASE: ${ORTHANC_PG_DATABASE}
+#      ORTHANC_PG_HOST:     postgres
+#      ORTHANC_PG_USER:     orthanc
+#      ORTHANC_PG_PASSWORD: ${POSTGRES_PASSWORD}
+#      ORTHANC_VERBOSE:     "true"
+#      TZ: "America/New_York"
+#    labels:
+#      - "traefik.port=8042"
+#      - "traefik.frontend.rule=PathPrefixStrip:/orthanc-connect/"
+#    depends_on:
+#      - postgres
+#    deploy:
+#      placement:
+#        constraints:
+#          - node.labels.storage==true
 
