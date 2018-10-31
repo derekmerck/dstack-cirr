@@ -9,7 +9,7 @@ volumes:
 
 networks:
   traefik:
-    external: true
+    driver: overlay
 
 services:
 
