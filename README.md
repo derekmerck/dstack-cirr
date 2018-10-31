@@ -83,7 +83,7 @@ POSTGRES_PASSWORD=postgres
 $ . cirr.env && docker stack deploy --compose-file=cirr-stack.yml cirr
 ```
 
-Note that if volumes are created, they are not removed when the stack is removed.
+Note that if volumes are created on a node, they are not removed when the stack is removed.  Manually remove them to clear errors about directories not found.
 
 
 
