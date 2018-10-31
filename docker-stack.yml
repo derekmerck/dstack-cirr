@@ -7,8 +7,6 @@ volumes:
         device: ${DATA_DIR}/postgres/data
         o: bind
 
-networks:
-  traefik:
 
 services:
 
@@ -52,9 +50,6 @@ services:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
       - 4242:4242
-    networks:
-      - default
-      - traefik
     environment:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_PG_ENABLED:       "true"
@@ -70,7 +65,6 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=traefik"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/archive/"
 
@@ -80,9 +74,6 @@ services:
     ports:
       - 5252:4242
       - 8052:8042
-    networks:
-      - default
-      - traefik
     environment:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
@@ -98,7 +89,6 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=traefik"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/router/"
 
@@ -108,9 +98,6 @@ services:
     ports:
       - 6262:4242
       - 8062:8042
-    networks:
-      - default
-      - traefik
     environment:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
@@ -123,6 +110,5 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=traefik"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
