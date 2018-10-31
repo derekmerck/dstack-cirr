@@ -68,7 +68,7 @@ $ docker stack deploy --compose-file=portainer-agent-stack.yml portainer
 
 4. Set Variables for Abstractions and Secrets
 
-Create a `cirr.env` file on the manager node.
+Create a `cirr.env` file and copy and source it to 
 
 ```yaml
 DATA_DIR=/data

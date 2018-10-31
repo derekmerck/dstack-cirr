@@ -26,8 +26,6 @@ services:
     image: postgres
     volumes:
       - pg_data:/var/lib/postgresql/data
-    expose:
-      - 5432
     environment:
       POSTGRES_USER:            orthanc
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
@@ -52,13 +50,13 @@ services:
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
-    labels:
-      - "traefik.port=8042"
-      - "traefik.frontend.rule=PathPrefixStrip:/archive/"
     depends_on:
       - postgres
     deploy:
       replicas: 1
+      labels:
+        - "traefik.port=8042"
+        - "traefik.frontend.rule=PathPrefixStrip:/archive/"
 
 
   router:
@@ -66,7 +64,7 @@ services:
     ports:
       - 5252:4242
     environment:
-      ORTHANC_REMOTE_PASSWORD:  ${ORTHANC_PASSWORD}
+      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
 
       ORTHANC_ROUTE_TO_PEERS:   orthanc
@@ -77,11 +75,11 @@ services:
 
       ORTHANC_VERBOSE:         "true"
       TZ:                      "America/New_York"
-    labels:
-      - "traefik.port=8042"
-      - "traefik.frontend.rule=PathPrefixStrip:/router/"
     deploy:
       replicas: 1
+      labels:
+        - "traefik.port=8042"
+        - "traefik.frontend.rule=PathPrefixStrip:/router/"
 
 
   bridge:
@@ -89,7 +87,7 @@ services:
     ports:
       - 6252:4242
     environment:
-      ORTHANC_REMOTE_PASSWORD:  ${ORTHANC_PASSWORD}
+      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
 
       ORTHANC_PEER_0:           archive,http://orthanc:8042,orthanc,${ORTHANC_PASSWORD}
@@ -97,8 +95,8 @@ services:
 
       ORTHANC_VERBOSE:         "true"
       TZ:                      "America/New_York"
-    labels:
-      - "traefik.port=8042"
-      - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
     deploy:
       replicas: 1
+      labels:
+        - "traefik.port=8042"
+        - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
