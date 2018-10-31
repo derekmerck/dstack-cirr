@@ -12,7 +12,10 @@ services:
 
   reverse-proxy:
     image: traefik
-    command: --api --docker
+    command:
+      - --api
+      - --docker
+      - --docker.swarmmode
     ports:
       - "80:80"
       - "8080:8080"
