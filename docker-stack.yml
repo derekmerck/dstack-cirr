@@ -7,6 +7,8 @@ volumes:
         device: ${DATA_DIR}/postgres/data
         o: bind
 
+networks:
+  traefik:
 
 services:
 
@@ -19,6 +21,8 @@ services:
     ports:
       - "80:80"
       - "8080:8080"
+    networks:
+      - traefik
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -47,6 +51,8 @@ services:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
       - 4242:4242
+    networks:
+      - traefik
     environment:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_PG_ENABLED:       "true"
@@ -70,6 +76,8 @@ services:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
       - 5252:4242
+    networks:
+    - traefik
     environment:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
@@ -93,6 +101,8 @@ services:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
       - 6252:4242
+    networks:
+      - traefik
     environment:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
