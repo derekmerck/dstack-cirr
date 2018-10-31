@@ -27,6 +27,8 @@ The bridge service can be manipulated using DIANA watcher scripts to monitor and
 
 See cloud-init: <https://gist.github.com/derekmerck/7b55c34c91954e84aa155e487ffe2e8d>
 
+Needs Docker >18? for ingress routing.
+
 The node(s) that support storage-bound operations (database, image archive) should have paths pre-created for Docker to use as persistent storage.
 
 ```yaml
