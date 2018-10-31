@@ -68,6 +68,7 @@ services:
     deploy:
       replicas: 1
       labels:
+        - "traefik.docker.network=traefik"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/archive/"
 
@@ -77,7 +78,7 @@ services:
     ports:
       - 5252:4242
     networks:
-    - traefik
+      - traefik
     environment:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
@@ -93,6 +94,7 @@ services:
     deploy:
       replicas: 1
       labels:
+        - "traefik.docker.network=traefik"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/router/"
 
@@ -115,5 +117,6 @@ services:
     deploy:
       replicas: 1
       labels:
+        - "traefik.docker.network=traefik"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
