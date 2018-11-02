@@ -4,7 +4,7 @@ volumes:
   pg_data:
     driver_opts:
         type: none
-        device: ${DATA_DIR}/postgres/data
+        device: /data/postgres/
         o: bind
 
 

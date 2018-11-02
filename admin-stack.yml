@@ -13,7 +13,7 @@ volumes:
   splunk_data:
     driver_opts:
         type: none
-        device: ${DATA_DIR}/splunk
+        device: /data/splunk
         o: bind
 
 
