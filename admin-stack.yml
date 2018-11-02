@@ -43,6 +43,8 @@ services:
       - "9000:9000"
     networks:
       - proxy
+    environment:
+      TZ: "America/New_York"
     deploy:
       replicas: 1
       placement:
@@ -65,9 +67,10 @@ services:
     volumes:
       - splunk_data:/var/lib/splunk/data
     environment:
-      - SPLUNK_START_ARGS: "--accept-license"
-      - SPLUNK_PASSWORD: $SPLUNK_PASSWORD
-      - SPLUNK_HEC_TOKEN: $SPLUNK_HEC_TOKEN
+      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_PASSWORD: $SPLUNK_PASSWORD
+      SPLUNK_HEC_TOKEN: $SPLUNK_HEC_TOKEN
+      TZ: "America/New_York"
     deploy:
       replicas: 1
       placement:
