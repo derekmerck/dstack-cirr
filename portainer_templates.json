@@ -7,7 +7,7 @@
     "platform": "linux",
     "repository": {
       "url": "https://github.com/derekmerck/dstack-cirr",
-      "stackfile": "docker-stack.yml"
+      "stackfile": "cirr-stack.yml"
     },
     "env": [
       {"name": "DATA_DIR",
@@ -21,7 +21,35 @@
         "default": "orthanc"},
       {"name": "POSTGRES_PASSWORD",
         "label": "Postgres password",
+        "default": "passw0rd!"},
+      {"name": "DEST_MOD",
+        "label": "Routing destination modalitiy (3D workstation)",
+        "default": "WORKSTATION,10.0.0.2,11112"}      ,
+      {"name": "BRIDGE_MOD",
+        "label": "Q/R bridge modality (PACS)",
+        "default": "PACS,10.0.0.1,11112"}
+    ]
+  },
+
+  {
+    "type": 1,
+    "title": "Orthanc Webviewer",
+    "description": "Add an Osimis webviewer-enabled Orthanc review node",
+    "categories": ["medical"],
+    "platform": "linux",
+    "image": "derekmerck/orthanc-wbv",
+    "env": [
+      {"name": "ORTHANC_PASSWORD",
+        "label": "Orthanc password",
+        "default": "passw0rd!"},
+      {"name": "ORTHANC_PG_DATABASE",
+        "label": "Postgres database name",
+        "default": "orthanc"},
+      {"name": "POSTGRES_PASSWORD",
+        "label": "Postgres password",
         "default": "passw0rd!"}
     ]
   }
+
+
 ]

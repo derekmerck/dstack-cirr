@@ -1,4 +1,4 @@
-# RIH Clinical Imaging Research Registry Stack
+# Image Registry Stacks
 
 Derek Merck  
 <derek_merck@brown.edu>  
@@ -6,37 +6,44 @@ Rhode Island Hospital and Brown University
 Providence, RI  
 
 
-## Overview
+Examples of deploying DICOM image registry stacks using Docker Swarm.
+
+
+## The RIH Clincial Imaging Research Registry Core
+
+The RIH CIRR was the initial development site for these configurations.
+
+### Overview
 
 Deploys:
 
 - A SQL backend service with bind-mounted storage (Postgresql)
-- A DICOM mass archive with bind-mounted storage (Orthanc)
-- A DICOM Q/R mass archive interface (Orthanc)
-- A DICOM ingress and simple routing mesh (Orthanc)
-- A DICOM Q/R brige service for external services (PACS)
+- A DICOM mass archive (Orthanc)
+- A simple DICOM routing service that multiplexes to the archive and $MOD_WRKSTN (Orthanc)
+- A DICOM Q/R bridge to $MOD_BRIDGE for external data pulls (Orthanc)
 
-The bridge service can be manipulated using DIANA watcher scripts to monitor and index the PACS or exfiltrate and anonymize large data collections.
+The bridge service can be manipulated using DIANA watcher scripts to monitor and index the PACS, or to exfiltrate and anonymize large data collections.
 
 
-## Usage
+### Usage
 
-### Provision Some Nodes
+At RIH, the CIRR runs in production on a pair of 16-core Xeon servers with 200GB of RAM each.  One node has an attached iSCSI interface to a 45TB StorSimple.  For staging, we use two disposable desktop-type machines with 4-8GB of RAM and about 1TB of disk.
 
-1. Setup some nodes with docker and `docker-compose`.
 
-See cloud-init: <https://gist.github.com/derekmerck/7b55c34c91954e84aa155e487ffe2e8d>
+#### Provision A Development Environment
 
-Needs Docker >18? for ingress routing.
+1. Provision a couple of nodes with docker and `docker-compose`.
 
-The node(s) that support storage-bound operations (database, image archive) should have paths pre-created for Docker to use as persistent storage.
+See cloud-init: <https://gist.github.com/derekmerck/7b55c34c91954e84aa155e487ffe2e8d>  Requires Docker v>18 for ingress routing.
+
+The node that supports storage-bound operations (PostgreSQL, Splunk) should have directories pre-created for Docker to use as persistent storage.
 
 ```yaml
-$ mkdir -p /data/orthanc/db
-$ mkdir -p /data/postgres/data
+$ mkdir -p /$DATA_DIR/splunk
+$ mkdir -p /$DATA_DIR/postgres
 ```
 
-### Setup the Swarm
+#### Setup the Swarm
 
 2. Create a Docker swarm
 
@@ -56,6 +63,10 @@ $ docker node update --label-add storage=true host1   # mounts mass storage
 $ docker node update --label-add bridge=true host2    # registered IP address for DICOM receipt
 ```
 
+#### Install the Administrative Backend
+
+This only needs to be done once and then all other services can share the same cluster manager management systems.
+
 3. Add the Portainer agent so you can watch the system
 
 ```bash
@@ -63,18 +74,25 @@ $ curl -L https://portainer.io/download/portainer-agent-stack.yml -o portainer-a
 $ docker stack deploy --compose-file=portainer-agent-stack.yml portainer
 ```
 
+4. Add a Traefik reverse proxy and Splunk server for log aggregation and data indexing.
 
-### Setup the CIRR
+```bash
+$ docker stack deploy --compose-file=admin-stack.yml splunk
+```
+
+#### Setup the CIRR
 
 4. Set Variables for Abstractions and Secrets
 
-Create a `cirr.env` file and copy and source it to 
+Create a `cirr.env` file on the master and source it.
 
 ```yaml
 DATA_DIR=/data
 ORTHANC_PG_DATABASE=orthanc
 ORTHANC_PASSWORD=orthanc
 POSTGRES_PASSWORD=postgres
+MOD_PACS=PACS,10.0.0.1,11112
+MOD_WORKSTATION=TERARECON,10.0.0.2,11112
 ```
 
 5. Start Up the Service Stack
@@ -85,24 +103,22 @@ $ . cirr.env && docker stack deploy --compose-file=cirr-stack.yml cirr
 
 Note that if volumes are created on a node, they are not removed when the stack is removed.  Manually remove them to clear errors about directories not found.
 
+Alternatively, you can log into Portainer after installing the admin stack and add the template file for the RIH CIRR from this repository.
 
 
+#### Augmenting the CIRR
+
+The CIRR can have additional Orthanc and DIANA nodes attached to it for various tasks.  
+
+- `derekmerck/orthanc-wbv` images can be used as research project mini-PACS servers.
+- `derekmerck/diana` or `derekmerck/diana-ai` images can be used for automated postprocessing and to drive continuous data monitoring tasks
 
 
-### Deploy CIRR Stack Template by Hand
+## The SIREN Stack
 
-
-Set your environment vars (with `.env`, for example)
-
-```bash
-$ docker-compose -f setup.docker-compose.yml up  # Creates reverse-proxy and portainer
-$ docker-compose up
-$ docker-compose scale orthanc=3
-```
-
-Alternatively, you can log into Portainer and add the stack template "RIH-CIRR", although it does not support service scaling.
-
-
+Differences:  
+- certficate validation
+- anon and compress on data ingress
 
 
 ## License

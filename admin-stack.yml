@@ -1,0 +1,79 @@
+version: '3.3'
+
+networks:
+  proxy:
+    driver: overlay
+
+
+volumes:
+  splunk_data:
+    driver_opts:
+        type: none
+        device: ${DATA_DIR}/postgres/data
+        o: bind
+
+
+services:
+
+  traefik:
+    image: traefik
+    command:
+      - --api
+      - --docker
+      - --docker.swarmmode
+    ports:
+      - "80:80"
+      - "433:433"
+      - "8080:8080"
+    networks:
+      - proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: "America/New_York"
+    deploy:
+      placement:
+        constraints:
+          - node.role==manager
+
+
+  portainer:
+    image: portainer/portainer
+    ports:
+      - "9000:9000"
+    networks:
+      - proxy
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role==manager
+      labels:
+        - "traefik.docker.network=proxy"
+        - "traefik.port=9000"
+        - "traefik.frontend.rule=PathPrefixStrip:/portianer/"
+
+
+  splunk:
+    image: splunk/splunk
+    ports:
+      - "8000:8000"
+      - "8088:8088"
+      - "8089:8089"
+    networks:
+      - proxy
+    volumes:
+      - splunk_data:/var/lib/splunk/data
+    environment:
+      - SPLUNK_START_ARGS: "--accept-license"
+      - SPLUNK_PASSWORD: $SPLUNK_PASSWORD
+      - SPLUNK_HEC_TOKEN: $SPLUNK_HEC_TOKEN
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage==true
+      labels:
+        - "traefik.docker.network=proxy"
+        - "traefik.port=8000"
+        - "traefik.frontend.rule=PathPrefixStrip:/splunk/"

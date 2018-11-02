@@ -1,5 +1,12 @@
 version: '3.3'
 
+networks:
+  proxy:
+    driver: overlay
+    # Created in admin-stack
+    external: true
+
+
 volumes:
   pg_data:
     driver_opts:
@@ -7,33 +14,8 @@ volumes:
         device: ${DATA_DIR}/postgres/data
         o: bind
 
-networks:
-  traefik:
-    driver: overlay
 
 services:
-
-  reverse-proxy:
-    image: traefik
-    command:
-      - --api
-      - --docker
-      - --docker.swarmmode
-    ports:
-      - "80:80"
-      - "8080:8080"
-    networks:
-      - default
-      - traefik
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      TZ: "America/New_York"
-    deploy:
-      placement:
-        constraints:
-          - node.role==manager
-
 
   postgres:
     image: postgres
@@ -44,19 +26,20 @@ services:
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
     deploy:
+      replicas: 1
       placement:
         constraints:
           - node.labels.storage==true
 
 
-  archive:
+  orthanc-archive:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
       - 4242:4242
     networks:
-      - default
-      - traefik
+      - proxy
     environment:
+      ORTHANC_AET:              CIRRARC
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
@@ -76,54 +59,49 @@ services:
         - "traefik.frontend.rule=PathPrefixStrip:/archive/"
 
 
-  router:
+  orthanc-router:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
-      - 5252:4242
-      - 8052:8042
+      - "5252:4242"
+      - "8052:8042"
     networks:
-      - default
-      - traefik
+      - proxy
     environment:
+      ORTHANC_AET:              CIRRMUX
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
-
-      ORTHANC_ROUTE_TO_PEERS:   orthanc
-      ORTHANC_ROUTE_TO_MODS:    terarecon
-
-      ORTHANC_PEER_0:           archive,http://orthanc:8042,orthanc,${ORTHANC_PASSWORD}
-      ORTHANC_MOD_0:            TERARECON,10.200.300.10,112
-
+      ORTHANC_ROUTE_TO_PEERS:   archive
+      ORTHANC_ROUTE_TO_MODS:    workstation
+      ORTHANC_PEER_0:           archive,http://orthanc-archive:8042,orthanc,${ORTHANC_PASSWORD}
+      ORTHANC_MOD_0:            workstation,${MOD_WORKSTATION}
       ORTHANC_VERBOSE:         "true"
       TZ:                      "America/New_York"
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=traefik"
+        - "traefik.docker.network=proxy"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/router/"
 
 
-  bridge:
+  orthanc-bridge:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
-      - 6262:4242
-      - 8062:8042
+      - "6262:4242"
+      - "8062:8042"
     networks:
-      - default
-      - traefik
+      - proxy
     environment:
+      ORTHANC_AET:              CIRR1
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
-
-      ORTHANC_PEER_0:           archive,http://orthanc:8042,orthanc,${ORTHANC_PASSWORD}
-      ORTHANC_MOD_0:            RIHPACS,10.200.300.10,112
-
-      ORTHANC_VERBOSE:         "true"
-      TZ:                      "America/New_York"
+      ORTHANC_PEER_0:           archive,http://orthanc-archive:8042,orthanc,${ORTHANC_PASSWORD}
+      ORTHANC_MOD_0:            pacs,${MOD_PACS}
+      ORTHANC_VERBOSE:          "true"
+      TZ:                       "America/New_York"
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=traefik"
+        - "traefik.docker.network=proxy"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/bridge/"

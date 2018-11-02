@@ -1,0 +1,54 @@
+version: '3.3'
+
+volumes:
+  pg_data:
+    driver_opts:
+        type: none
+        device: ${DATA_DIR}/postgres/data
+        o: bind
+
+
+services:
+
+  postgres:
+    image: postgres
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER:            orthanc
+      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
+      TZ: "America/New_York"
+    deploy:
+      placement:
+        constraints:
+          - node.labels.storage==true
+
+
+  hobit:
+    image: derekmerck/orthanc-wbv:latest-amd64
+    ports:
+      - 4242:4242
+    environment:
+      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      ORTHANC_PG_ENABLED:       "true"
+      ORTHANC_PG_STORE_DICOM:   "true"
+      ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}
+      ORTHANC_PG_HOST:          postgres
+      ORTHANC_PG_USER:          orthanc
+      ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
+      ORTHANC_VERBOSE:          "true"
+
+      ORTHANC_ANONYMIZE_ON_INGRESS: "true"
+      ORTHANC_COMPRESS_ON_INGRESS: "true"
+
+      ORTHANC_WBV_ENABLED:      "true"
+
+      TZ:                       "America/New_York"
+    depends_on:
+      - postgres
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.port=8042"
+        - "traefik.frontend.rule=PathPrefixStrip:/hobit/"
+
