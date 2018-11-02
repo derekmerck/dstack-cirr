@@ -13,7 +13,7 @@ volumes:
   splunk_data:
     driver_opts:
         type: none
-        device: ${DATA_DIR}/postgres/data
+        device: ${DATA_DIR}/splunk
         o: bind
 
 
@@ -86,7 +86,7 @@ services:
     networks:
       - proxy_network
     volumes:
-      - splunk_data:/var/lib/splunk/data
+      - splunk_data:/opt/splunk/etc
     environment:
       SPLUNK_START_ARGS: "--accept-license"
       SPLUNK_PASSWORD: $SPLUNK_PASSWORD
