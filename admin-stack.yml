@@ -36,7 +36,7 @@ services:
 
   portainer:
     image: portainer/portainer
-    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    command: -H tcp://tasks.portainer-agent:9001 --tlsskipverify
     ports:
       - "9000:9000"
     networks:
@@ -52,7 +52,7 @@ services:
       labels:
         - "traefik.docker.network=proxy_network"
         - "traefik.port=9000"
-        - "traefik.frontend.rule=PathPrefixStrip:/portianer/"
+        - "traefik.frontend.rule=PathPrefixStrip:/portainer/"
 
 
   traefik:
