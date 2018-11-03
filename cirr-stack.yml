@@ -1,17 +1,20 @@
 version: '3.3'
 
+
 networks:
-  proxy:
+  service_network:
     driver: overlay
-    # Created in admin-stack
-    external: true
+    attachable: true
+
+  proxy_network:
+    external: true   # Created by admin-stack
 
 
 volumes:
   pg_data:
     driver_opts:
         type: none
-        device: /data/postgres
+        device: ${DATA_DIR}/postgres
         o: bind
 
 
@@ -19,6 +22,8 @@ services:
 
   postgres:
     image: postgres
+    networks:
+    - service_network
     volumes:
       - pg_data:/var/lib/postgresql/data
     environment:
@@ -37,7 +42,8 @@ services:
     ports:
       - 4242:4242
     networks:
-      - proxy
+      - service_network
+      - proxy_network
     environment:
       ORTHANC_AET:              CIRRARC
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
@@ -49,12 +55,12 @@ services:
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
-    depends_on:
-      - postgres
+    links:
+      - postgres:postgres
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=traefik"
+        - "traefik.docker.network=proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/archive/"
 
@@ -65,7 +71,8 @@ services:
       - "5252:4242"
       - "8052:8042"
     networks:
-      - proxy
+      - service_network
+      - proxy_network
     environment:
       ORTHANC_AET:              CIRRMUX
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
@@ -79,7 +86,7 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=proxy"
+        - "traefik.docker.network=proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/router/"
 
@@ -90,7 +97,8 @@ services:
       - "6262:4242"
       - "8062:8042"
     networks:
-      - proxy
+      - service_network
+      - proxy_network
     environment:
       ORTHANC_AET:              CIRR1
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
@@ -102,6 +110,6 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=proxy"
+        - "traefik.docker.network=proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/bridge/"

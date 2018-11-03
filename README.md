@@ -19,8 +19,8 @@ Deploys:
 
 - A SQL backend service with bind-mounted storage (Postgresql)
 - A DICOM mass archive (Orthanc)
-- A simple DICOM routing service that multiplexes to the archive and $MOD_WRKSTN (Orthanc)
-- A DICOM Q/R bridge to $MOD_BRIDGE for external data pulls (Orthanc)
+- A simple DICOM routing service that multiplexes to the archive and $MOD_WORKSTATION (Orthanc)
+- A DICOM Q/R bridge to $MOD_PACS for external data pulls (Orthanc)
 
 The bridge service can be manipulated using DIANA watcher scripts to monitor and index the PACS, or to exfiltrate and anonymize large data collections.
 
@@ -65,20 +65,22 @@ $ docker node update --label-add bridge=true host2    # registered IP address fo
 
 #### Install the Administrative Backend
 
-This only needs to be done once and then all other services can share the same cluster manager management systems.
+This only needs to be done once and then all other services can share the same cluster manager management systems.  
 
-3. Add the Portainer agent so you can watch the system
-
-```bash
-$ curl -L https://portainer.io/download/portainer-agent-stack.yml -o portainer-agent-stack.yml
-$ docker stack deploy --compose-file=portainer-agent-stack.yml portainer
-```
-
-4. Add a Traefik reverse proxy and Splunk server for log aggregation and data indexing.
+3. Install the admin backend stack:
 
 ```bash
-$ docker stack deploy --compose-file=admin-stack.yml splunk
+$ docker stack deploy --compose-file=admin-stack.yml cirr
 ```
+
+This creates:
+ 
+- A Portainer/Portainer-agent service for monitoring the stack on port 9000 
+- A Traefik reverse proxy service on ports 80, 433, and 8080
+- A Splunk data aggregation service (with a HEC ingress token enabled) on ports 8000 and 8088-89
+- A network overlay for Portainer-agent communication
+- A proxy network overlay for Traefik routing -- additional stacks should be connected to this as an external network
+
 
 #### Setup the CIRR
 
@@ -87,12 +89,12 @@ $ docker stack deploy --compose-file=admin-stack.yml splunk
 Create a `cirr.env` file on the master and source it.
 
 ```yaml
-DATA_DIR=/data
-ORTHANC_PG_DATABASE=orthanc
-ORTHANC_PASSWORD=orthanc
-POSTGRES_PASSWORD=postgres
-MOD_PACS=PACS,10.0.0.1,11112
-MOD_WORKSTATION=TERARECON,10.0.0.2,11112
+export DATA_DIR=/data
+export ORTHANC_PG_DATABASE=orthanc
+export ORTHANC_PASSWORD=orthanc
+export POSTGRES_PASSWORD=postgres
+export MOD_PACS=PACS,10.0.0.1,11112  # aet, ip addr, port format
+export MOD_WORKSTATION=TERARECON,10.0.0.2,11112
 ```
 
 5. Start Up the Service Stack
@@ -101,7 +103,7 @@ MOD_WORKSTATION=TERARECON,10.0.0.2,11112
 $ . cirr.env && docker stack deploy --compose-file=cirr-stack.yml cirr
 ```
 
-Note that if volumes are created on a node, they are not removed when the stack is removed.  Manually remove them to clear errors about directories not found.
+Note that if volumes are created on a node, they are not removed when the stack is removed.  Manually remove them to clear errors about directories not being found.
 
 Alternatively, you can log into Portainer after installing the admin stack and add the template file for the RIH CIRR from this repository.
 
@@ -111,14 +113,14 @@ Alternatively, you can log into Portainer after installing the admin stack and a
 The CIRR can have additional Orthanc and DIANA nodes attached to it for various tasks.  
 
 - `derekmerck/orthanc-wbv` images can be used as research project mini-PACS servers.
-- `derekmerck/diana` or `derekmerck/diana-ai` images can be used for automated postprocessing and to drive continuous data monitoring tasks
+- `derekmerck/diana` or `derekmerck/diana-ai` images can be used for automated post-processing and to drive continuous data monitoring tasks
 
 
 ## The SIREN Stack
 
 Differences:  
-- certficate validation
-- anon and compress on data ingress
+- Certficate validation
+- Anonymization and compression on data ingress
 
 
 ## License

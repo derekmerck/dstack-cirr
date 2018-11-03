@@ -3,6 +3,7 @@ version: '3.3'
 networks:
   proxy_network:
     driver: overlay
+    attachable: true
 
   agent_network:
     driver: overlay
@@ -13,7 +14,7 @@ volumes:
   splunk_data:
     driver_opts:
         type: none
-        device: /data/splunk
+        device: ${DATA_DIR}/splunk
         o: bind
 
 
@@ -89,8 +90,8 @@ services:
       - splunk_data:/opt/splunk/etc
     environment:
       SPLUNK_START_ARGS: "--accept-license"
-      SPLUNK_PASSWORD: $SPLUNK_PASSWORD
-      SPLUNK_HEC_TOKEN: $SPLUNK_HEC_TOKEN
+      SPLUNK_PASSWORD: ${SPLUNK_PASSWORD}
+      SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}
       TZ: "America/New_York"
     deploy:
       replicas: 1
