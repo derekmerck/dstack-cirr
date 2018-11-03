@@ -6,7 +6,7 @@ networks:
     driver: overlay
     attachable: true
 
-  proxy_network:
+  cirr_proxy_network:
     external: true   # Created by admin-stack
 
 
@@ -43,7 +43,7 @@ services:
       - 4242:4242
     networks:
       - service_network
-      - proxy_network
+      - cirr_proxy_network
     environment:
       ORTHANC_AET:              CIRRARC
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
@@ -72,7 +72,7 @@ services:
       - "8052:8042"
     networks:
       - service_network
-      - proxy_network
+      - cirr_proxy_network
     environment:
       ORTHANC_AET:              CIRRMUX
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
@@ -98,7 +98,7 @@ services:
       - "8062:8042"
     networks:
       - service_network
-      - proxy_network
+      - cirr_proxy_network
     environment:
       ORTHANC_AET:              CIRR1
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
