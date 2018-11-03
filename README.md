@@ -80,11 +80,13 @@ This creates:
 - A Splunk data aggregation service (with a HEC ingress token enabled) on ports 8000 and 8088-89
 - A network overlay for Portainer-agent communication
 - A proxy network overlay for Traefik routing -- additional stacks should be connected to this as an external network
+  _Note: The label on participating services for the Traefik network should be prefixed by the cluster name, i.e., `traefik.docker.network=cirr_proxy_network`_
+
 
 
 #### Setup the CIRR
 
-4. Set Variables for Abstractions and Secrets
+4. Set Variables for abstractions and secrets
 
 Create a `cirr.env` file on the master and source it.
 
@@ -103,9 +105,9 @@ export MOD_WORKSTATION=TERARECON,10.0.0.2,11112
 $ . cirr.env && docker stack deploy --compose-file=cirr-stack.yml cirr
 ```
 
-Note that if volumes are created on a node, they are not removed when the stack is removed.  Manually remove them to clear errors about directories not being found.
+Note that if volumes are created on a node, they are _not_ removed when the stack is removed.  They must manually be removed to clear errors about directories not being found.
 
-Alternatively, you can log into Portainer after installing the admin stack and add the template file for the RIH CIRR from this repository.
+Alternatively, you can log into Portainer after installing the admin stack and add the template file for the RIH CIRR.
 
 
 #### Augmenting the CIRR

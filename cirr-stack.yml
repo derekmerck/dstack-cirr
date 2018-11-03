@@ -60,7 +60,7 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=proxy_network"
+        - "traefik.docker.network=cirr_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/archive/"
 
@@ -86,7 +86,7 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=proxy_network"
+        - "traefik.docker.network=cirr_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/router/"
 
@@ -110,6 +110,6 @@ services:
     deploy:
       replicas: 1
       labels:
-        - "traefik.docker.network=proxy_network"
+        - "traefik.docker.network=cirr_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
