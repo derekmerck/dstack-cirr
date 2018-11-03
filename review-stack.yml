@@ -18,6 +18,7 @@ services:
       - cirr_proxy_network
     environment:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      ORTHANC_WBV_ENABLED:      "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
       ORTHANC_PG_DATABASE:      "wbv1"  # Any unique name
