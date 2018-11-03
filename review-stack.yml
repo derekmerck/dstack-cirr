@@ -12,7 +12,7 @@ networks:
 services:
 
   orthanc-wbv:
-    image: derekmerck/orthanc-wbv:amd64
+    image: derekmerck/orthanc-wbv:latest-amd64
     networks:
       - cirr_service_network
       - cirr_proxy_network
