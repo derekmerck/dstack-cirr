@@ -31,7 +31,7 @@ services:
 
   diana-mock:
     image: derekmerck/diana
-    # command:                    python3 apps/cli/diana-mock.py -S DIANA_SERVICES -d mock -r 30
+    command:                    python3 apps/cli/diana-mock.py -S DIANA_SERVICES -d mock -r 30
     environment:
       DIANA_SERVICES: >
                                 {
