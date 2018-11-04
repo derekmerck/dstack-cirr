@@ -35,7 +35,12 @@ services:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/wbv/"
-
+      limits:
+        cpus: '0.5'
+        memory: 500M
+      reservations:
+        cpus: '0.2'
+        memory: 100M
 
   diana-indexer:
     image: derekmerck/diana
@@ -49,3 +54,9 @@ services:
       TZ:                       "America/New_York"
     deploy:
       replicas: 1
+      limits:
+        cpus: '0.5'
+        memory: 500M
+      reservations:
+        cpus: '0.2'
+        memory: 100M

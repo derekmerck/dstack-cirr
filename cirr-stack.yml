@@ -35,7 +35,12 @@ services:
       placement:
         constraints:
           - node.labels.storage==true
-
+      limits:
+        cpus: '2'
+        memory: 4G
+      reservations:
+        cpus: '0.5'
+        memory: 2G
 
   orthanc-archive:
     image: derekmerck/orthanc-confd:latest-amd64
@@ -63,7 +68,12 @@ services:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/archive/"
-
+      limits:
+        cpus: '0.5'
+        memory: 500M
+      reservations:
+        cpus: '0.2'
+        memory: 100M
 
   orthanc-router:
     image: derekmerck/orthanc-confd:latest-amd64
@@ -90,7 +100,12 @@ services:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/router/"
-
+      limits:
+        cpus: '0.5'
+        memory: 500M
+      reservations:
+        cpus: '0.2'
+        memory: 100M
 
   orthanc-bridge:
     image: derekmerck/orthanc-confd:latest-amd64
@@ -116,3 +131,9 @@ services:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
+      limits:
+        cpus: '0.5'
+        memory: 500M
+      reservations:
+        cpus: '0.2'
+        memory: 100M
