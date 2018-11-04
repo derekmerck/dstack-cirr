@@ -20,6 +20,7 @@ services:
       ORTHANC_AET:              MOCKPACS
       ORTHANC_MAX_PATIENTS:     50
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      ORTHANC_MOD_0:            cirr,CIRR1,orthanc-bridge,4242
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
     deploy:
