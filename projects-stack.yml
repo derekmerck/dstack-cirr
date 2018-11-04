@@ -5,7 +5,7 @@ networks:
   cirr_service_network:
     external: true   # Created by cirr-stack
 
-  cirr_proxy_network:
+  admin_proxy_network:
     external: true   # Created by admin-stack
 
 
@@ -15,9 +15,11 @@ services:
     image: derekmerck/orthanc-wbv:latest-amd64
     networks:
       - cirr_service_network
-      - cirr_proxy_network
+      - admin_proxy_network
     environment:
+      ORTHANC_NAME:             CIRR Supplemental Review
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_WBV_ENABLED:      "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
@@ -28,9 +30,9 @@ services:
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
     deploy:
-      replicas: 1
+      replicas: 1  # PG provides data persistence
       labels:
-        - "traefik.docker.network=cirr_proxy_network"
+        - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/wbv/"
 

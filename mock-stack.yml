@@ -1,0 +1,42 @@
+version: '3.3'
+
+
+networks:
+
+  admin_proxy_network:
+    external: true   # Created by admin-stack
+
+
+services:
+
+  orthanc-mock:
+    image: derekmerck/orthanc-confd:latest-amd64
+    networks:
+      - admin_proxy_network
+    environment:
+      ORTHANC_NAME:             Mock PACS
+      ORTHANC_AET:              MOCKPACS
+      ORTHANC_MAX_PATIENTS:     50
+      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      ORTHANC_VERBOSE:          "true"
+      TZ:                       "America/New_York"
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.docker.network=admin_proxy_network"
+        - "traefik.port=8042"
+        - "traefik.frontend.rule=PathPrefixStrip:/wbv/"
+
+
+  diana-mock:
+    image: derekmerck/diana
+    environment:
+      command:                  python3 apps/cli/diana-mock.py -S DIANA_SERVICES -d mock -r 30
+      DIANA_SERVICES: >
+                                {
+                                  "mock": {"host": "orthanc-mock",
+                                           "password": "${ORTHANC_PASSWORD}" }
+                                }
+      TZ:                       "America/New_York"
+    deploy:
+      replicas: 1

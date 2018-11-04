@@ -6,7 +6,7 @@ networks:
     driver: overlay
     attachable: true
 
-  cirr_proxy_network:
+  admin_proxy_network:
     external: true   # Created by admin-stack
 
 
@@ -23,7 +23,7 @@ services:
   postgres:
     image: postgres
     networks:
-    - service_network
+      - service_network
     volumes:
       - pg_data:/var/lib/postgresql/data
     environment:
@@ -43,10 +43,12 @@ services:
       - 4242:4242
     networks:
       - service_network
-      - cirr_proxy_network
+      - admin_proxy_network
     environment:
+      ORTHANC_NAME:             CIRR Archive
       ORTHANC_AET:              CIRRARC
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
       ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}
@@ -58,9 +60,9 @@ services:
     links:
       - postgres:postgres
     deploy:
-      replicas: 1
+      replicas: 2  # Multiple nodes, PG provides data persistence
       labels:
-        - "traefik.docker.network=cirr_proxy_network"
+        - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/archive/"
 
@@ -72,9 +74,10 @@ services:
       - "8052:8042"
     networks:
       - service_network
-      - cirr_proxy_network
+      - admin_proxy_network
     environment:
-      ORTHANC_AET:              CIRRMUX
+      ORTHANC_NAME:             CIRR Router
+      ORTHANC_AET:              CIRRROUTER
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
       ORTHANC_ROUTE_TO_PEERS:   archive
@@ -84,9 +87,9 @@ services:
       ORTHANC_VERBOSE:         "true"
       TZ:                      "America/New_York"
     deploy:
-      replicas: 1
+      replicas: 1  # Single node, semi-persistent data
       labels:
-        - "traefik.docker.network=cirr_proxy_network"
+        - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/router/"
 
@@ -98,18 +101,20 @@ services:
       - "8062:8042"
     networks:
       - service_network
-      - cirr_proxy_network
+      - admin_proxy_network
     environment:
+      ORTHANC_NAME:             CIRR Bridge
       ORTHANC_AET:              CIRR1
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
       ORTHANC_PEER_0:           archive,http://orthanc-archive:8042,orthanc,${ORTHANC_PASSWORD}
-      ORTHANC_MOD_0:            pacs,${MOD_PACS}
+      ORTHANC_MOD_0:            mock,MOCK,orthanc-mock.mock,4242
+      ORTHANC_MOD_1:            pacs,${MOD_PACS}
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
     deploy:
-      replicas: 1
+      replicas: 1  # Single node, semi-persistent data
       labels:
-        - "traefik.docker.network=cirr_proxy_network"
+        - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
