@@ -39,7 +39,7 @@ services:
 
   diana-indexer:
     image: derekmerck/diana
-    # command: python3 /opt/diana/apps/cli/diana-watcher.py -S DIANA_SERVICES -r proxied_index mock splunk
+    command: python3 /opt/diana/apps/cli/diana-watcher.py -S DIANA_SERVICES -r proxied_index mock splunk
     networks:
       - cirr_service_network  # for orthanc-bridge
       - admin_proxy_network   # for splunk
