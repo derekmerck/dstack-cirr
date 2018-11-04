@@ -12,6 +12,7 @@ services:
   orthanc-mock:
     image: derekmerck/orthanc-confd:latest-amd64
     networks:
+      - default
       - admin_proxy_network
     environment:
       ORTHANC_NAME:             Mock PACS
@@ -30,8 +31,8 @@ services:
 
   diana-mock:
     image: derekmerck/diana
+    command:                    python3 apps/cli/diana-mock.py -S DIANA_SERVICES -d mock -r 30
     environment:
-      command:                  python3 apps/cli/diana-mock.py -S DIANA_SERVICES -d mock -r 30
       DIANA_SERVICES: >
                                 {
                                   "mock": {"host": "orthanc-mock",
