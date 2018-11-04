@@ -106,7 +106,7 @@ services:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
       ORTHANC_PEER_0:           archive,http://orthanc-archive:8042,orthanc,${ORTHANC_PASSWORD}
-      ORTHANC_MOD_0:            mock,MOCK,orthanc-mock.mock,4242
+      ORTHANC_MOD_0:            mock,MOCK,orthanc-mock,4242
       ORTHANC_MOD_1:            pacs,${MOD_PACS}
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
