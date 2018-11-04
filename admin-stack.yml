@@ -38,7 +38,7 @@ services:
 
   portainer:
     image: portainer/portainer
-    command: -H tcp://tasks.portainer-agent:9001 --tlsskipverify
+    command: -H tcp://tasks.portainer-agent:9001 --tlsskipverify --admin-password ${PORTAINER_PASSWORD}
     ports:
       - "9000:9000"
     networks:

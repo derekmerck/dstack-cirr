@@ -57,8 +57,6 @@ services:
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
-    links:
-      - postgres:postgres
     deploy:
       replicas: 2  # Multiple nodes, PG provides data persistence
       labels:
