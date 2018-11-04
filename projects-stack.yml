@@ -36,3 +36,15 @@ services:
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/wbv/"
 
+
+    diana-indexer:
+      image: derekmerck/diana
+      # command: python3 /opt/diana/apps/cli/diana-watcher.py -S DIANA_SERVICES -r proxied_index mock splunk
+      networks:
+        - cirr_service_network
+      environment:
+        DIANA_SERVICES: >
+          {"mock":{"host":"orthanc-bridge","password":"${ORTHANC_PASSWORD}","query_dict":{"ModalitiesInStudy":"","StudyDescription":"*"},"query_domain":"mock","query_level":1,"query_discovery_period":-300,"polling_interval":120},"splunk":{"host":"splunk","default_index":"dicom","default_token":"watcher","hec_tokens":{"watcher":"${SPLUNK_HEC_TOKEN}"}}}
+        TZ:                       "America/New_York"
+      deploy:
+        replicas: 1

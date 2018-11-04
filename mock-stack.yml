@@ -3,6 +3,7 @@ version: '3.3'
 
 networks:
 
+  # Remove for unproxied stacks
   admin_proxy_network:
     external: true   # Created by admin-stack
 

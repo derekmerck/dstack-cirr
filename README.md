@@ -1,4 +1,4 @@
-# Image Registry Stacks
+# Image Registry Docker Stacks
 
 Derek Merck  
 <derek_merck@brown.edu>  
@@ -9,33 +9,38 @@ Providence, RI
 Examples of deploying DICOM image registry stacks using Docker Swarm.
 
 
-## The RIH Clincial Imaging Research Registry Core
+## The RIH Clincial Imaging Research Registry
 
 The RIH CIRR was the initial development site for these configurations.
 
 
 ### Overview
 
-Deploys:
+The RIH CIRR stack deploys multiple services to the Swarm cluster.
 
-- A SQL backend service with bind-mounted storage (Postgresql)
-- A DICOM mass archive (Orthanc)
-- A simple DICOM routing service that multiplexes to the archive and $MOD_WORKSTATION (Orthanc)
-- A DICOM Q/R bridge to $MOD_PACS for external data pulls (Orthanc)
+- A [Traefik][] reverse proxy
+- A [Portainer][] agent network
+- A [Postgres][] database with bind-mounted storage
+- A [Splunk][] data aggregator with bind-mounted storage
+- An [Orthanc][] DICOM archive
+- An Orthanc instance configured as a simple DICOM ingress multiplexer to the archive and $MOD_WORKSTATION
+- An Orthanc instance configured as a DICOM Q/R bridge to $MOD_PACS for external data pulls
 
 The bridge service can be manipulated using DIANA watcher scripts to monitor and index the PACS, or to exfiltrate and anonymize large data collections.
+
+[Traefik]: https://traefik.io
+[Postgres]: https://www.postgresql.org
+[Splunk]: https://www.splunk.com
+[Orthanc]: https://www.orthanc-server.com
 
 
 ### Usage
 
-At RIH, the CIRR runs in production on a pair of 16-core Xeon servers with 200GB of RAM each.  One node has an attached iSCSI interface to a 45TB StorSimple.  The system handles around one hundred thousand image studies per year or about 10 million image instances.
+#### Provision An Environment
 
-For staging, we use two disposable desktop-type machines with 4-8GB of RAM and about 1TB of disk.
-
-For testing, we use two disposable atom-based cloud instances with 8GB of RAM and 10GB of disk.
-
-
-#### Provision A Development Environment
+- At RIH, the CIRR runs in production on a pair of 16-core Xeon servers with 200GB of RAM each.  One node has an attached iSCSI interface to a 45TB StorSimple.  The system handles around one hundred thousand image studies per year or about 10 million image instances.
+- For staging, we use two disposable desktop-type machines with 4-8GB of RAM and about 1TB of disk.
+- For testing, we use two disposable atom-based cloud instances with 8GB of RAM and 10GB of disk.
 
 1. Provision 2-3 nodes with Docker and `docker-compose`.
 
@@ -78,9 +83,12 @@ Create a `cirr.env` file on the master and source it.
 
 ```yaml
 export DATA_DIR=/data
-SPLUNK_PASSWORD=5plunK!
-SPLUNK_HEC_TOKEN=blah
+PORTAINER_PASSWORD=<hashed pw>
+SPLUNK_PASSWORD=splunk
+SPLUNK_HEC_TOKEN=TOKEN0-TOKEN0-TOKEN0-TOKEN
 ```
+
+_Note: The Splunk password must be at least 8 characters long, or Splunk will fail to initialize properly._
 
 4. Install the "admin" backend stack:
 
@@ -88,14 +96,15 @@ SPLUNK_HEC_TOKEN=blah
 $ . cirr.env && docker stack deploy --compose-file=admin-stack.yml admin
 ```
 
-This creates:
+Result:
  
-- A Portainer/Portainer-agent service for monitoring the stack on port 9000 
-- A Traefik reverse proxy service on ports 80, 433, and 8080
-- A Splunk data aggregation service (with a HEC ingress token enabled) on ports 8000 and 8088-89
-- A network overlay for Portainer-agent communication
-- A proxy network overlay for Traefik routing -- additional stacks should be connected to `admin_proxy_network` as an external network
-  _Note: The label on participating services for the Traefik network should be prefixed by the cluster name, i.e., `traefik.docker.network=admin_proxy_network`_
+- Adds a Portainer/Portainer-agent service for monitoring the stack on port 9000 
+- Adds a Traefik reverse proxy service on ports 80, 433, and 8080
+- Adds a Splunk data aggregation service (with a HEC ingress token enabled) on ports 8000 and 8088-89
+- Adds a network overlay for Portainer-agent communication
+- Adds a proxy network overlay for Traefik routing
+  - Additional stacks should be connected to `admin_proxy_network` as an external network
+  - Labels on participating services should be set for the Traefik network, i.e., `traefik.docker.network=admin_proxy_network`_
 
 
 #### Setup the CIRR
@@ -119,6 +128,14 @@ export MOD_WORKSTATION=TERARECON,10.0.0.2,11112
 $ . cirr.env && docker stack deploy --compose-file=cirr-stack.yml cirr
 ```
 
+Result:
+
+- Adds the postgres backend for the cirr_service_network on port 5432
+  - Additional stacks should be connected to `cirr_service_network` to use the shared postgres backend
+- Adds a replicated Orthanc archive service on DICOM port 4242
+- Adds the Orthanc ingress MUX on DICOM port 5252
+- Adds the Orthanc bridge service on DICOM port 6262
+
 Note that if volumes are created on a node, they are _not_ removed when the stack is removed.  They must manually be removed to clear errors about directories not being found.
 
 
@@ -135,6 +152,10 @@ The CIRR can have additional Orthanc and DIANA nodes attached to it for various 
 $ docker stack deploy --compose-file=projects-stack.yml projects
 ```
 
+Result:
+
+- Adds a project-specific Orthanc instance with the Osimis webviewer plugin.
+
 
 #### Testing
 
@@ -144,6 +165,11 @@ $ docker stack deploy --compose-file=projects-stack.yml projects
 $ docker stack deploy --compose-file=mock-stack.yml mock
 ```
 
+Result:
+
+- Adds a mock PACS service on DICOM port 7272
+
+
 
 ## The SIREN Stack
 
@@ -151,6 +177,17 @@ Differences:
 - Certficate validation
 - Anonymization and compression on data ingress
 
+
+
+## Notes
+
+Portainer showing multiple copies of the same container:
+
+````bash
+$ docker service rm admin_portainer-agent
+$ docker service rm admin_portainer
+$ docker stack deploy -c admin-stack.yml admin
+````
 
 ## License
 
