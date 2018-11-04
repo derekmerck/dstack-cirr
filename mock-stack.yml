@@ -25,7 +25,7 @@ services:
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/wbv/"
+        - "traefik.frontend.rule=PathPrefixStrip:/mock/"
 
 
   diana-mock:
