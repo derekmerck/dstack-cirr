@@ -103,9 +103,10 @@ services:
         - "traefik.docker.network=cirr_proxy_network"
         - "traefik.port=8000"
         - "traefik.frontend.rule=PathPrefixStrip:/splunk/"
-      limits:
-        cpus: '1.0'
-        memory: 4G
-      reservations:
-        cpus: '0.2'
-        memory: 2G
+      resources:
+        limits:
+          cpus:   '2'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 2G

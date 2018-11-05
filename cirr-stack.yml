@@ -37,10 +37,10 @@ services:
           - node.labels.storage==true
       resources:
         limits:
-          cpus: '2'
+          cpus:  '2'
           memory: 4G
         reservations:
-          cpus: '0.5'
+          cpus:   '0.5'
           memory: 2G
 
   orthanc-archive:
@@ -71,10 +71,10 @@ services:
         - "traefik.frontend.rule=PathPrefixStrip:/archive/"
       resources:
         limits:
-          cpus: '0.5'
+          cpus:   '0.5'
           memory: 500M
         reservations:
-          cpus: '0.2'
+          cpus:   '0.2'
           memory: 100M
 
   orthanc-router:
@@ -104,10 +104,10 @@ services:
         - "traefik.frontend.rule=PathPrefixStrip:/router/"
       resources:
         limits:
-          cpus: '0.5'
+          cpus:   '0.5'
           memory: 500M
         reservations:
-          cpus: '0.2'
+          cpus:   '0.2'
           memory: 100M
 
   orthanc-bridge:
@@ -136,8 +136,8 @@ services:
         - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
       resources:
         limits:
-          cpus: '0.5'
+          cpus:   '0.5'
           memory: 500M
         reservations:
-          cpus: '0.2'
+          cpus:   '0.2'
           memory: 100M

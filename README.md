@@ -83,9 +83,9 @@ Create a `cirr.env` file on the master and source it.
 
 ```yaml
 export DATA_DIR=/data
-PORTAINER_PASSWORD=<hashed pw>
-SPLUNK_PASSWORD=splunk
-SPLUNK_HEC_TOKEN=TOKEN0-TOKEN0-TOKEN0-TOKEN
+export PORTAINER_PASSWORD=<hashed pw>
+export SPLUNK_PASSWORD=<plain pw>
+export SPLUNK_HEC_TOKEN=TOKEN0-TOKEN0-TOKEN0-TOKEN
 ```
 
 _Note: The Splunk password must be at least 8 characters long, or Splunk will fail to initialize properly._
@@ -105,6 +105,18 @@ Result:
 - Adds a proxy network overlay for Traefik routing
   - Additional stacks should be connected to `admin_proxy_network` as an external network
   - Labels on participating services should be set for the Traefik network, i.e., `traefik.docker.network=admin_proxy_network`_
+  
+
+TODO:
+
+Currently have to manually do a bunch of things:
+
+- add a dicom index 
+- add a hec token
+- enable hec
+- switch off https for hec
+
+I did these all with an Ansible role previously.  Need to investigate implementing similar here.
 
 
 #### Setup the CIRR
@@ -136,6 +148,10 @@ Result:
 - Adds the Orthanc ingress MUX on DICOM port 5252
 - Adds the Orthanc bridge service on DICOM port 6262
 
+TODO:
+
+- Need to tweak postgres settings to use much more memory when available
+
 Note that if volumes are created on a node, they are _not_ removed when the stack is removed.  They must manually be removed to clear errors about directories not being found.
 
 
@@ -154,7 +170,8 @@ $ docker stack deploy --compose-file=projects-stack.yml projects
 
 Result:
 
-- Adds a project-specific Orthanc instance with the Osimis webviewer plugin.
+- Adds a project-specific Orthanc instance with the Osimis webviewer plugin
+- Adds an indexing service that uses the bridge to watch a PACS and collect study metadata in Splunk (pointed at mock by default)
 
 
 #### Testing
@@ -170,13 +187,20 @@ Result:
 - Adds a mock PACS service on DICOM port 7272
 
 
+#### Notes
+
+Some points of potential failure here:
+
+- The database backend is constrained to a single system with a large disk store.  This would benefit from a distributed storage system, like Rexray.
+- The IP address for the bridge is hardcoded into the sending modalities and PACS.  They should be using a name with multiple IP's or an non-bound IP that can be reassigned across the cluster as necessary.
+- With a setup of 3 machines, only fault tolerant against loss of a single manager node
+
 
 ## The SIREN Stack
 
 Differences:  
 - Certficate validation
 - Anonymization and compression on data ingress
-
 
 
 ## Notes
@@ -188,6 +212,7 @@ $ docker service rm admin_portainer-agent
 $ docker service rm admin_portainer
 $ docker stack deploy -c admin-stack.yml admin
 ````
+
 
 ## License
 
