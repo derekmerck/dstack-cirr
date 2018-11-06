@@ -110,10 +110,11 @@ services:
           cpus:   '0.2'
           memory: 100M
 
+  # AET, port, and ip registered with the pacs
   orthanc-bridge:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
-      - "6262:4242"
+      - "11112:4242"
       - "8062:8042"
     networks:
       - service_network

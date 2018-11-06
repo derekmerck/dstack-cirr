@@ -49,8 +49,7 @@ services:
   diana-indexer:
     image: derekmerck/diana
     # Comment out command to idle a connected diana container for testing
-    # command: python3 /opt/diana/apps/cli/diana-watcher.py -s /diana_services.yml -r proxied_index mock-studies splunk
-    # command: python3 /opt/diana/apps/cli/diana-watcher.py -s /diana_services.yml -R /diana_routes.yml
+    # command: python3 /opt/diana/apps/cli/diana-watcher.py -s /diana_services.yml -c /diana_routes.yml
     networks:
       - cirr_service_network    # for orthanc-bridge
       - admin_proxy_network     # for splunk
