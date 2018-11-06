@@ -120,7 +120,7 @@ services:
       - admin_proxy_network
     environment:
       ORTHANC_NAME:             CIRR Bridge
-      ORTHANC_AET:              CIRR1
+      ORTHANC_AET:              CIRR0
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS:     50
       ORTHANC_PEER_0:           archive,http://orthanc-archive:8042,orthanc,${ORTHANC_PASSWORD}
