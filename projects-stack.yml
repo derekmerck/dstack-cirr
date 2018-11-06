@@ -46,15 +46,18 @@ services:
 
   diana-indexer:
     image: derekmerck/diana
-    # command: python3 /opt/diana/apps/cli/diana-watcher.py -s DIANA_SERVICES -r proxied_index mock splunk
+    # command: python3 /opt/diana/apps/cli/diana-watcher.py -S DIANA_SERVICES -r proxied_index mock splunk
+    # command: python3 /opt/diana/apps/cli/diana-watcher.py -s /diana_services.yml -r proxied_index mock-studies splunk --dump
     networks:
       - cirr_service_network    # for orthanc-bridge
       - admin_proxy_network     # for splunk
     configs:
       - diana_services.yml
     environment:
-      DIANA_SERVICES: >
-        {"mock":{"host":"orthanc-bridge","password":"${ORTHANC_PASSWORD}","query_dict":{"ModalitiesInStudy":"","StudyDescription":"*"},"query_domain":"mock","query_level":1,"query_discovery_period":300,"polling_interval":120},"splunk":{"host":"splunk","default_index":"dicom","default_token":"watcher","hec_tokens":{"watcher":"${SPLUNK_HEC_TOKEN}"}}}
+      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      SPLUNK_HEC_TOKEN:         ${SPLUNK_HEC_TOKEN}
+#      DIANA_SERVICES: >
+#        {"mock":{"host":"orthanc-bridge","password":"${ORTHANC_PASSWORD}","query_dict":{"ModalitiesInStudy":"","StudyDescription":"*"},"query_domain":"mock","query_level":1,"query_discovery_period":300,"polling_interval":120},"splunk":{"host":"splunk","default_index":"dicom","default_token":"watcher","hec_tokens":{"watcher":"${SPLUNK_HEC_TOKEN}"}}}
       TZ:                       "America/New_York"
     deploy:
       replicas: 1
