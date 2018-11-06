@@ -46,13 +46,19 @@ services:
 
   diana-indexer:
     image: derekmerck/diana
-    command: python3 /opt/diana/apps/cli/diana-watcher.py -S DIANA_SERVICES -r proxied_index mock splunk
+    # command: python3 /opt/diana/apps/cli/diana-watcher.py -s DIANA_SERVICES -r proxied_index mock splunk
     networks:
-      - cirr_service_network  # for orthanc-bridge
-      - admin_proxy_network   # for splunk
+      - cirr_service_network    # for orthanc-bridge
+      - admin_proxy_network     # for splunk
+    configs:
+      - services.yml
     environment:
       DIANA_SERVICES: >
         {"mock":{"host":"orthanc-bridge","password":"${ORTHANC_PASSWORD}","query_dict":{"ModalitiesInStudy":"","StudyDescription":"*"},"query_domain":"mock","query_level":1,"query_discovery_period":300,"polling_interval":120},"splunk":{"host":"splunk","default_index":"dicom","default_token":"watcher","hec_tokens":{"watcher":"${SPLUNK_HEC_TOKEN}"}}}
       TZ:                       "America/New_York"
     deploy:
       replicas: 1
+
+configs:
+  services.yml:
+    file: ./services.yml

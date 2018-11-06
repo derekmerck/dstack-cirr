@@ -29,6 +29,7 @@ The RIH CIRR stack deploys multiple services to the Swarm cluster.
 The bridge service can be manipulated using DIANA watcher scripts to monitor and index the PACS, or to exfiltrate and anonymize large data collections.
 
 [Traefik]: https://traefik.io
+[Portainer]: https://portainer.io
 [Postgres]: https://www.postgresql.org
 [Splunk]: https://www.splunk.com
 [Orthanc]: https://www.orthanc-server.com
@@ -63,7 +64,7 @@ $ ssh host2
 > docker swarm join ... etc
 ```
 
-2. Tag unique nodes for the scheduler
+3. Tag unique nodes for the scheduler
 
 The `storage` node will be assigned the database backend and DICOM mass archive accessors.  
 Any `bridge` nodes will be assigned DICOM ingress, routing, and bridging services (b/c typically modalities register and allow endpoint access by specific IP addrs)
@@ -77,7 +78,7 @@ $ docker node update --label-add bridge=true host2    # registered IP address fo
 
 This only needs to be done once and then all other stacks can share the same cluster and data management systems.  
 
-3. Set variables for abstractions and secrets
+4. Set variables for abstractions and secrets
 
 Create a `cirr.env` file on the master and source it.
 
@@ -85,12 +86,12 @@ Create a `cirr.env` file on the master and source it.
 export DATA_DIR=/data
 export PORTAINER_PASSWORD=<hashed pw>
 export SPLUNK_PASSWORD=<plain pw>
-export SPLUNK_HEC_TOKEN=TOKEN0-TOKEN0-TOKEN0-TOKEN
+export SPLUNK_HEC_TOKEN=<TOKEN0-TOKEN0-TOKEN0-TOKEN0>
 ```
 
 _Note: The Splunk password must be at least 8 characters long, or Splunk will fail to initialize properly._
 
-4. Install the "admin" backend stack:
+5. Install the "admin" backend stack:
 
 ```bash
 $ . cirr.env && docker stack deploy --compose-file=admin-stack.yml admin
@@ -104,7 +105,7 @@ Result:
 - Adds a network overlay for Portainer-agent communication
 - Adds a proxy network overlay for Traefik routing
   - Additional stacks should be connected to `admin_proxy_network` as an external network
-  - Labels on participating services should be set for the Traefik network, i.e., `traefik.docker.network=admin_proxy_network`_
+  - Labels on participating services should be set for the Traefik network, i.e., `traefik.docker.network=admin_proxy_network`
   
 
 TODO:
@@ -121,7 +122,7 @@ I did these all with an Ansible role previously.  Need to investigate implementi
 
 #### Setup the CIRR
 
-5. Set variables for abstractions and secrets
+6. Set variables for abstractions and secrets
 
 Addend `cirr.env` with service-specific secrets.
 
@@ -134,7 +135,7 @@ export MOD_PACS=PACS,10.0.0.1,11112  # aet, ip addr, port format
 export MOD_WORKSTATION=TERARECON,10.0.0.2,11112
 ```
 
-6. Start up the service stack
+7. Start up the service stack
 
 ```bash
 $ . cirr.env && docker stack deploy --compose-file=cirr-stack.yml cirr
@@ -162,7 +163,7 @@ The CIRR can have additional Orthanc and DIANA nodes attached to it for various 
 - `derekmerck/orthanc-wbv` images can be used as research project mini-PACS servers.
 - `derekmerck/diana` or `derekmerck/diana-ai` images can be used for automated post-processing and to drive continuous data monitoring tasks
 
-6. Start up a projects stack
+8. Start up a projects stack
 
 ```bash
 $ docker stack deploy --compose-file=projects-stack.yml projects
@@ -176,7 +177,7 @@ Result:
 
 #### Testing
 
-7. Add a mock pacs and random study header generator:
+9. Add a mock pacs and random study header generator:
 
 ```bash
 $ docker stack deploy --compose-file=mock-stack.yml mock

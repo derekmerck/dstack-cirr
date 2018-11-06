@@ -1,0 +1,33 @@
+---
+mock:
+  host: orthanc-mock
+  password: "${ORTHANC_PASSWORD}"
+
+mock-studies:
+  host: orthanc-bridge
+  password: "${ORTHANC_PASSWORD}"
+  query_dict:
+    ModalitiesInStudy: ''
+    StudyDescription:  "*"
+  query_domain: mock
+  query_level: 1
+  query_discovery_period: 300
+  polling_interval: 120
+
+mock-reports:
+  host: orthanc-bridge
+  password: "${ORTHANC_PASSWORD}"
+  query_dict:
+    Modality: 'SR'
+    SeriesDescription:  "*"
+  query_domain: mock
+  query_level: 2
+  query_discovery_period: 300
+  polling_interval: 120
+
+splunk:
+  host: splunk
+  default_index: dicom
+  default_token: watcher
+  hec_tokens:
+    watcher: "${SPLUNK_HEC_TOKEN}"
