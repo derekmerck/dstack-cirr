@@ -4,8 +4,7 @@
   dest: splunk
   handler: proxied_index
 
-## PACS reports (with instance data)
-#- source: mock-reports
-#  dest: splunk
-#  handler: proxied_index
-
+# PACS reports (with instance data)
+- source: pacs-studies
+  dest: splunk
+  handler: proxied_index

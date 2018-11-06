@@ -1,4 +1,16 @@
 ---
+
+pacs-studies:
+  host: orthanc-bridge
+  password: "${ORTHANC_PASSWORD}"
+  query_dict:
+    ModalitiesInStudy: ''
+    StudyDescription:  "*"
+  query_domain: pacs
+  query_level: 1
+  query_discovery_period: 300
+  polling_interval: 120
+
 mock:
   host: orthanc-mock
   password: "${ORTHANC_PASSWORD}"
