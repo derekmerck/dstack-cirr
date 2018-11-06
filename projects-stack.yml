@@ -51,7 +51,7 @@ services:
       - cirr_service_network    # for orthanc-bridge
       - admin_proxy_network     # for splunk
     configs:
-      - services.yml
+      - diana_services.yml
     environment:
       DIANA_SERVICES: >
         {"mock":{"host":"orthanc-bridge","password":"${ORTHANC_PASSWORD}","query_dict":{"ModalitiesInStudy":"","StudyDescription":"*"},"query_domain":"mock","query_level":1,"query_discovery_period":300,"polling_interval":120},"splunk":{"host":"splunk","default_index":"dicom","default_token":"watcher","hec_tokens":{"watcher":"${SPLUNK_HEC_TOKEN}"}}}
@@ -60,5 +60,5 @@ services:
       replicas: 1
 
 configs:
-  services.yml:
-    file: ./services.yml
+  diana_services.yml:
+    file: ./diana_services.yml
