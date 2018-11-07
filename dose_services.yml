@@ -1,0 +1,12 @@
+---
+dose:
+  host: orthanc-dose
+  password: "${ORTHANC_PASSWORD}"
+  polling_interval: 30
+
+splunk:
+  host: splunk
+  default_index: dose_index1
+  default_token: diana
+  hec_tokens:
+    watcher: "${SPLUNK_HEC_TOKEN}"

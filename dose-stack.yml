@@ -18,34 +18,7 @@ services:
       - "9000:9000"
     environment:
       TZ: "America/New_York"
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role==manager
-      labels:
-        - "traefik.docker.network=dose_proxy_network"
-        - "traefik.port=9000"
-        - "traefik.frontend.rule=PathPrefixStrip:/portainer/"
 
-  traefik:
-    image: traefik
-    command:
-      - --api
-      - --docker
-      - --docker.swarmmode
-    ports:
-      - "80:80"
-      - "433:433"
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      TZ: "America/New_York"
-    deploy:
-      placement:
-        constraints:
-          - node.role==manager
 
   splunk:
     image: splunk/splunk
@@ -60,22 +33,7 @@ services:
       SPLUNK_PASSWORD:  ${SPLUNK_PASSWORD}
       SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}
       TZ:               "America/New_York"
-    deploy:
-      replicas: 1
-      placement:
-        constraints:
-          - node.labels.storage==true
-      labels:
-        - "traefik.docker.network=cirr_proxy_network"
-        - "traefik.port=8000"
-        - "traefik.frontend.rule=PathPrefixStrip:/splunk/"
-      resources:
-        limits:
-          cpus:   '2'
-          memory: 4G
-        reservations:
-          cpus: '0.5'
-          memory: 2G
+
 
   orthanc-dose:
     image: derekmerck/orthanc-confd:latest-amd64
@@ -85,36 +43,22 @@ services:
       ORTHANC_MAX_PATIENTS: 50
       ORTHANC_VERBOSE:      "true"
       TZ:                   "America/New_York"
-    deploy:
-      replicas: 1
-      labels:
-        - "traefik.docker.network=admin_proxy_network"
-        - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/dose/"
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 500M
-        reservations:
-          cpus: '0.2'
-          memory: 100M
+
 
   # DIANA services and routes are complicated to config through environment vars (but it is possible).
   # It is much easier to define them through mapped service and routing yaml config files.
   diana-indexer:
     image: derekmerck/diana
     # Comment out command to idle a connected diana container for testing
-    command: python3 /opt/diana/apps/cli/diana-watcher.py -s /diana_services.yml -r index_tags dose splunk
+    command: python3 /opt/diana/apps/cli/diana-watcher.py -s /dose_services.yml -r index_tags dose splunk
     configs:
-      - diana_services.yml
+      - dose_services.yml
     environment:
       ORTHANC_PASSWORD:     ${ORTHANC_PASSWORD}
       SPLUNK_HEC_TOKEN:     ${SPLUNK_HEC_TOKEN}
       TZ:                   "America/New_York"
-    deploy:
-      replicas: 1
 
 
 configs:
   diana_services.yml:
-    file: ./diana_services.yml
+    file: ./dose_services.yml
