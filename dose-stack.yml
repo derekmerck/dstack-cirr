@@ -30,8 +30,7 @@ services:
       - "8188:8088"
       - "8189:8089"
     volumes:
-      - splunk_data:/opt/splunk/etc
-      - splunk_data:/opt/splunk/var
+      - /data/splunk:/opt/splunk
     environment:
       SPLUNK_START_ARGS: "--accept-license"
       SPLUNK_PASSWORD:  ${SPLUNK_PASSWORD}
