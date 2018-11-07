@@ -14,7 +14,7 @@ services:
   portainer:
     image: portainer/portainer
     command:
-      - "--admin-password ${PORTAINER_PASSWORD}"
+      - "--admin-password '${PORTAINER_PASSWORD}'"
       - "-H unix:///var/run/docker.sock"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
