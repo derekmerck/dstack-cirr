@@ -1,4 +1,4 @@
-version: '3.2'
+version: '3.1'
 
 
 volumes:
@@ -37,6 +37,9 @@ services:
 
   orthanc-dose:
     image: derekmerck/orthanc-confd:latest-amd64
+    ports:
+      - "11112:4242"
+      - "8042:8042"
     environment:
       ORTHANC_NAME:         Dose Reports
       ORTHANC_PASSWORD:     ${ORTHANC_PASSWORD}
