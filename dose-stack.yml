@@ -17,6 +17,8 @@ services:
       - "--admin-password ${PORTAINER_PASSWORD}"
       - "-v /var/run/docker.sock:/var/run/docker.sock"
       - "-H unix:///var/run/docker.sock"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
     ports:
       - "9000:9000"
     environment:
