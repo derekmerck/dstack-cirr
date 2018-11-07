@@ -8,5 +8,6 @@ splunk:
   host: splunk
   default_index: dose_index1
   default_token: diana_tok
+  hec_port: 8188
   hec_tokens:
     diana_tok: "${SPLUNK_HEC_TOKEN}"
