@@ -13,7 +13,10 @@ services:
 
   portainer:
     image: portainer/portainer
-    command: --admin-password ${PORTAINER_PASSWORD} -v "/var/run/docker.sock:/var/run/docker.sock"
+    command:
+      - "--admin-password ${PORTAINER_PASSWORD}"
+      - "-v /var/run/docker.sock:/var/run/docker.sock"
+      - "-H unix:///var/run/docker.sock"
     ports:
       - "9000:9000"
     environment:
