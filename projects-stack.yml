@@ -43,7 +43,6 @@ services:
           cpus: '0.2'
           memory: 100M
 
-
   # DIANA services and routes are complicated to config through environment vars (but it is possible).
   # It is much easier to define them through mapped service and routing yaml config files.
   diana-indexer:

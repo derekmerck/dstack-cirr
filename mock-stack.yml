@@ -30,16 +30,17 @@ services:
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/mock/"
 
-
   diana-mock:
     image: derekmerck/diana
-    command:                    python3 /opt/diana/apps/cli/diana-mock.py -S DIANA_SERVICES -d mock -r 30
+    command:                    python3 /opt/diana/apps/cli/diana-mock.py -s /diana_services.yml -d mock -r 30
     environment:
-      DIANA_SERVICES: >
-                                {
-                                  "mock": {"host": "orthanc-mock",
-                                           "password": "${ORTHANC_PASSWORD}" }
-                                }
       TZ:                       "America/New_York"
+    configs:
+      - diana_services.yml
     deploy:
       replicas: 1
+
+
+configs:
+  diana_services.yml:
+    file: ./diana_services.yml

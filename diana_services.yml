@@ -37,6 +37,12 @@ mock-reports:
   query_discovery_period: 300
   polling_interval: 120
 
+dose:
+  host: orthanc-dose
+  password: "${ORTHANC_PASSWORD}"
+  query_discovery_period: 300
+  polling_interval: 120
+
 splunk:
   host: splunk
   default_index: dicom
