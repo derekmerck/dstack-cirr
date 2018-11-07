@@ -1,12 +1,12 @@
 version: '3.1'
 
 
-volumes:
-  splunk_data:
-    driver_opts:
-        type: none
-        device: ${DATA_DIR}/splunk
-        o: bind
+#volumes:
+#  splunk_data:
+#    driver_opts:
+#        type: none
+#        device: ${DATA_DIR}/splunk
+#        o: bind
 
 
 services:
