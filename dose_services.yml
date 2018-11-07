@@ -6,7 +6,7 @@ dose:
 
 splunk:
   host: splunk
-  default_index: dose_index1
+  default_index: dose_reports1
   default_token: diana_tok
   hec_tokens:
     diana_tok: "${SPLUNK_HEC_TOKEN}"
