@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.2'
 
 
 volumes:
@@ -50,15 +50,9 @@ services:
   diana-indexer:
     image: derekmerck/diana
     # Comment out command to idle a connected diana container for testing
-    command: python3 /opt/diana/apps/cli/diana-watcher.py -s /dose_services.yml -r index_tags dose splunk
-    configs:
-      - dose_services.yml
+    # command: python3 /opt/diana/apps/cli/diana-watcher.py -s /dose_services.yml -r index_tags dose splunk
     environment:
       ORTHANC_PASSWORD:     ${ORTHANC_PASSWORD}
       SPLUNK_HEC_TOKEN:     ${SPLUNK_HEC_TOKEN}
       TZ:                   "America/New_York"
 
-
-configs:
-  diana_services.yml:
-    file: ./dose_services.yml
