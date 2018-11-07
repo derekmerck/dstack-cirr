@@ -214,6 +214,13 @@ $ docker service rm admin_portainer
 $ docker stack deploy -c admin-stack.yml admin
 ````
 
+Don't forget to turn off acknoweldgement in the HEC -- otherwise it will insist on a data channel and show up with 400's
+
+Testing:
+```bash
+curl -k http://splunk:8088/services/collector -H "Authorization: Splunk $SPLUNK_HEC_TOKEN" -d '{"event":"Hello, World!"}'
+```
+
 
 ## License
 
