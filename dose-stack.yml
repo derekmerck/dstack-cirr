@@ -58,7 +58,7 @@ services:
     image: derekmerck/diana
     # Comment out command to idle a connected diana container for testing
     working_dir: /opt/diana
-    command: git pull && pip install -e packages/diana && python3 /opt/diana/apps/cli/diana-watcher.py -s /dose_services.yml -r index_instance_tags dose splunk
+    command: sh -c "git pull && pip install -e packages/diana && python3 /opt/diana/apps/cli/diana-watcher.py -s /dose_services.yml -r index_instance_tags dose splunk"
     volumes:
       - ./dose_services.yml:/dose_services.yml
     environment:
