@@ -7,6 +7,6 @@ dose:
 splunk:
   host: splunk
   default_index: dose_index1
-  default_token: diana
+  default_token: diana_tok
   hec_tokens:
-    watcher: "${SPLUNK_HEC_TOKEN}"
+    diana_tok: "${SPLUNK_HEC_TOKEN}"
