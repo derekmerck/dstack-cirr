@@ -13,7 +13,7 @@ services:
 
   portainer:
     image: portainer/portainer
-    command: --admin-password ${PORTAINER_PASSWORD}
+    command: --admin-password ${PORTAINER_PASSWORD} -v "/var/run/docker.sock:/var/run/docker.sock"
     ports:
       - "9000:9000"
     environment:
@@ -42,6 +42,7 @@ services:
       - "8042:8042"
     environment:
       ORTHANC_NAME:         Dose Reports
+      ORTHANC_AET:          DIANA
       ORTHANC_PASSWORD:     ${ORTHANC_PASSWORD}
       ORTHANC_MAX_PATIENTS: 50
       ORTHANC_VERBOSE:      "true"
