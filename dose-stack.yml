@@ -47,7 +47,7 @@ services:
       ORTHANC_NAME:         Dose Reports
       ORTHANC_AET:          DIANA
       ORTHANC_PASSWORD:     ${ORTHANC_PASSWORD}
-      ORTHANC_MAX_PATIENTS: 50
+      ORTHANC_MAX_PATIENTS: 2000
       ORTHANC_VERBOSE:      "true"
       TZ:                   "America/New_York"
 
