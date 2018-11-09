@@ -221,6 +221,14 @@ Testing:
 curl -k http://splunk:8088/services/collector -H "Authorization: Splunk $SPLUNK_HEC_TOKEN" -d '{"event":"Hello, World!"}'
 ```
 
+Increase length for `_json` sources:
+
+`/opt/splunk/etc/system/local/props.conf`
+
+```toml
+[_json]
+TRUNCATE = 500000
+```
 
 ## License
 

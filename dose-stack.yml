@@ -1,12 +1,9 @@
 version: '3.1'
 
 
-#volumes:
-#  splunk_data:
-#    driver_opts:
-#        type: none
-#        device: ${DATA_DIR}/splunk
-#        o: bind
+# Limited persistent data for backloading ~6 days of studies
+volumes:
+  orthanc_data:
 
 
 services:
@@ -43,6 +40,8 @@ services:
     ports:
       - "11112:4242"
       - "8042:8042"
+    volumes:
+      - orthanc_data:/var/lib/orthanc/db
     environment:
       ORTHANC_NAME:         Dose Reports
       ORTHANC_AET:          DIANA
