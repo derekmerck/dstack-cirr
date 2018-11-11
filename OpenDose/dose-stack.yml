@@ -1,3 +1,4 @@
+# Old version of Docker, doesn't support configs
 version: '3.1'
 
 

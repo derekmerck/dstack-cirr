@@ -1,0 +1,15 @@
+---
+splunk:
+  host: splunk
+  default_index: dicom
+  default_token: diana_tok
+  hec_tokens:
+    diana_tok: "${SPLUNK_HEC_TOKEN}"
+
+hobit:
+  host: orthanc-hobit
+  password: "${ORTHANC_PASSWORD}"
+
+boost:
+  host: orthanc-boost
+  password: "${ORTHANC_PASSWORD}"

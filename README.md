@@ -1,4 +1,4 @@
-# Image Registry Docker Stacks
+# DICOM Image Registry Docker Stacks
 
 Derek Merck  
 <derek_merck@brown.edu>  
@@ -8,10 +8,14 @@ Providence, RI
 
 Examples of deploying DICOM image registry stacks using Docker Swarm.
 
+- [The RIH CIRR][]
+- [The SIREN CIRR][]
+- [The OpenDose CIRR][]
 
-## The RIH Clincial Imaging Research Registry
 
-The RIH CIRR was the initial development site for these configurations.
+## The RIH CIRR
+
+The RIH Clinical Imaging Research Repository (CIRR) was the initial development site for all of these configurations.
 
 
 ### Overview
@@ -23,8 +27,8 @@ The RIH CIRR stack deploys multiple services to the Swarm cluster.
 - A [Postgres][] database with bind-mounted storage
 - A [Splunk][] data aggregator with bind-mounted storage
 - An [Orthanc][] DICOM archive
-- An Orthanc instance configured as a simple DICOM ingress multiplexer to the archive and $MOD_WORKSTATION
-- An Orthanc instance configured as a DICOM Q/R bridge to $MOD_PACS for external data pulls
+- An Orthanc instance configured as a simple DICOM ingress multiplexer to the archive and 3D workstations
+- An Orthanc instance configured as a DICOM Q/R bridge to the PACS for external data pulls
 
 The bridge service can be manipulated using DIANA watcher scripts to monitor and index the PACS, or to exfiltrate and anonymize large data collections.
 
@@ -39,20 +43,22 @@ The bridge service can be manipulated using DIANA watcher scripts to monitor and
 
 #### Provision An Environment
 
-- At RIH, the CIRR runs in production on a pair of 16-core Xeon servers with 200GB of RAM each.  One node has an attached iSCSI interface to a 45TB StorSimple.  The system handles around one hundred thousand image studies per year or about 10 million image instances.
-- For staging, we use two disposable desktop-type machines with 4-8GB of RAM and about 1TB of disk.
-- For testing, we use two disposable atom-based cloud instances with 8GB of RAM and 10GB of disk.
+- At RIH, the CIRR runs in production on a pair of 16-core Xeon servers with 200GB of RAM each.  One node has an attached iSCSI interface to a 45TB StorSimple.  The system handles around one hundred thousand image studies, or about 10 million image instances, per year.
+- For staging, we use two disposable desktop-type machines with 8GB of RAM and about 1TB of disk.
+- For testing, we use two disposable Atom-based cloud instances with 8GB of RAM and 10GB of disk.
 
 1. Provision 2-3 nodes with Docker and `docker-compose`.
 
-See cloud-init: <https://gist.github.com/derekmerck/7b55c34c91954e84aa155e487ffe2e8d>  Requires Docker >18 for ingress routing.
+_Note: Requires Docker version >= 18 for ingress routing._
 
 The node that supports storage-bound operations (PostgreSQL, Splunk) should have directories pre-created for Docker to use as persistent storage.
 
+See cloud-init: <https://gist.github.com/derekmerck/7b55c34c91954e84aa155e487ffe2e8d>
+
 ```yaml
-$ mkdir -p /$DATA_DIR/splunk
-$ mkdir -p /$DATA_DIR/postgres
+$ mkdir -p /data/{splunk,postgres}
 ```
+
 
 #### Setup the Swarm
 
@@ -67,7 +73,7 @@ $ ssh host2
 3. Tag unique nodes for the scheduler
 
 The `storage` node will be assigned the database backend and DICOM mass archive accessors.  
-Any `bridge` nodes will be assigned DICOM ingress, routing, and bridging services (b/c typically modalities register and allow endpoint access by specific IP addrs)
+Any `bridge` nodes will be assigned DICOM ingress, routing, and bridging services (b/c typically modalities authorize endpoint access by specific IP address.)
 
 ```bash
 $ docker node update --label-add storage=true host1   # mounts mass storage
@@ -76,7 +82,7 @@ $ docker node update --label-add bridge=true host2    # registered IP address fo
 
 #### Install the Administrative Backend
 
-This only needs to be done once and then all other stacks can share the same cluster and data management systems.  
+The admin stack only needs to be deployed once, and then all other stacks can share the same cluster and data management systems.  
 
 4. Set variables for abstractions and secrets
 
@@ -94,7 +100,7 @@ _Note: The Splunk password must be at least 8 characters long, or Splunk will fa
 5. Install the "admin" backend stack:
 
 ```bash
-$ . cirr.env && docker stack deploy --compose-file=admin-stack.yml admin
+$ . cirr.env && docker stack deploy -c admin-stack.yml admin
 ```
 
 Result:
@@ -116,13 +122,14 @@ Currently have to manually do a bunch of things:
 - add a hec token
 - enable hec
 - switch off https for hec
+- re-deploy with correct hec token
 
 I did these all with an Ansible role previously.  Need to investigate implementing similar here.
 
 
-#### Setup the CIRR
+#### Setup the CIRR Core
 
-6. Set variables for abstractions and secrets
+6. Set additional variables for abstractions and secrets
 
 Addend `cirr.env` with service-specific secrets.
 
@@ -138,7 +145,7 @@ export MOD_WORKSTATION=TERARECON,10.0.0.2,11112
 7. Start up the service stack
 
 ```bash
-$ . cirr.env && docker stack deploy --compose-file=cirr-stack.yml cirr
+$ . cirr.env && docker stack deploy -c cirr-stack.yml cirr
 ```
 
 Result:
@@ -153,7 +160,7 @@ TODO:
 
 - Need to tweak postgres settings to use much more memory when available
 
-Note that if volumes are created on a node, they are _not_ removed when the stack is removed.  They must manually be removed to clear errors about directories not being found.
+_Note: if volumes are created on a node, they are not removed when the stack is removed.  They must manually be removed to clear errors about directories not being found._
 
 
 #### Augmenting the CIRR with Additional Projects
@@ -172,7 +179,7 @@ $ docker stack deploy --compose-file=projects-stack.yml projects
 Result:
 
 - Adds a project-specific Orthanc instance with the Osimis webviewer plugin
-- Adds an indexing service that uses the bridge to watch a PACS and collect study metadata in Splunk (pointed at mock by default)
+- Adds an indexing service that uses the bridge to watch a PACS and collect study metadata in Splunk (pointed at `mock` by default)
 
 
 #### Testing
@@ -180,7 +187,7 @@ Result:
 9. Add a mock pacs and random study header generator:
 
 ```bash
-$ docker stack deploy --compose-file=mock-stack.yml mock
+$ docker stack deploy -c mock-stack.yml mock
 ```
 
 Result:
@@ -197,11 +204,19 @@ Some points of potential failure here:
 - With a setup of 3 machines, only fault tolerant against loss of a single manager node
 
 
-## The SIREN Stack
+## The SIREN CIRR
 
 Differences:  
-- Certficate validation
+- SSL certficate validation
 - Anonymization and compression on data ingress
+
+
+## The OpenDose CIRR
+
+Differences:
+- Orthanc router ingress
+- DIANA watcher for instance indexing
+- Splunk dashboards
 
 
 ## Notes

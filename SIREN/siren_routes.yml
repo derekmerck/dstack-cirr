@@ -1,0 +1,8 @@
+---
+- source: incoming-hobit
+  dest: orthanc-hobit
+  handler: move_and_anonymize
+
+- source: orthanc-hobit
+  dest: splunk
+  handler: index_series
