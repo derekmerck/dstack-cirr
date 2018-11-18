@@ -1,8 +1,16 @@
 ---
-- source: incoming-hobit
-  dest: orthanc-hobit
-  handler: move_and_anonymize
+- source:  incoming-hobit
+  event:   NEW_FILE
+  handler: move
+  dest:    orthanc-hobit
 
-- source: orthanc-hobit
-  dest: splunk
-  handler: index_series
+- source:  orthanc-hobit-queue
+  event:   STABLE_STUDY
+  handler: move
+  args:    anon=true
+  dest:    orthanc-hobit
+
+- source:  orthanc-hobit
+  event:   STABLE_STUDY
+  handler: index
+  dest:    splunk

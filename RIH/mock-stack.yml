@@ -15,6 +15,8 @@ services:
     networks:
       - default
       - admin_proxy_network
+    ports:
+      - "2424:4242"
     environment:
       ORTHANC_NAME:             Mock PACS
       ORTHANC_AET:              MOCKPACS

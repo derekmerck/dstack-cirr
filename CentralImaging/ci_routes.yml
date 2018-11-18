@@ -1,0 +1,16 @@
+---
+- source:  incoming-christianson
+  event:   NEW_FILE
+  handler: move
+  dest:    orthanc-christianson
+
+- source:  orthanc-christianson-queue
+  event:   STABLE_STUDY
+  handler: move
+  args:    anon=true
+  dest:    orthanc-christianson
+
+- source:  orthanc-christianson
+  event:   STABLE_STUDY
+  handler: index
+  dest:    splunk

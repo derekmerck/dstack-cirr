@@ -2,11 +2,14 @@ version: '3.3'
 
 
 configs:
-  siren_services.yml:
-    file: ./siren_services.yml
-  siren_routes.yml:
-    file: ./siren_routes.yml
+  ci_services.yml:
+    file: ./ci_services.yml
+  ci_routes.yml:
+    file: ./ci_routes.yml
 
+secrets:
+  service_password:
+    file: ./service_password.txt
 
 services:
 
@@ -16,7 +19,8 @@ services:
 
   portainer:
     image: portainer/portainer
-    command: -H tcp://tasks.portainer-agent:9001 --tlsskipverify --admin-password ${PORTAINER_PASSWORD}
+    command: -H tcp://tasks.portainer-agent:9001 --tlsskipverify --admin-password-file '/run/secrets/service_password'
+
     ports:
       - "9000:9000"
     environment:
@@ -29,6 +33,8 @@ services:
       placement:
         constraints:
           - node.role==manager
+    secrets:
+    - service_password
 
 
   traefik:
@@ -125,16 +131,16 @@ services:
   # UNCONSTRAINED SERVICES
   # -------------------------------
 
-  orthanc-hobit:
+  orthanc-christianson:
     image: derekmerck/orthanc-wbv
     environment:
-      ORTHANC_NAME:             HOBIT Imaging
+      ORTHANC_NAME:             Christianson Imaging
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_WBV_ENABLED:      "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
-      ORTHANC_PG_DATABASE:      hobit
+      ORTHANC_PG_DATABASE:      christianson
       ORTHANC_PG_HOST:          postgres
       ORTHANC_PG_USER:          orthanc
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
@@ -144,29 +150,7 @@ services:
       replicas: 1
       labels:
         - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/hobit/"
-
-
-  orthanc-boost:
-    image: derekmerck/orthanc-wbv
-    environment:
-      ORTHANC_NAME:             BOOST Imaging
-      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
-      ORTHANC_STORE_COMPRESSED: "true"
-      ORTHANC_WBV_ENABLED:      "true"
-      ORTHANC_PG_ENABLED:       "true"
-      ORTHANC_PG_STORE_DICOM:   "true"
-      ORTHANC_PG_DATABASE:      boost
-      ORTHANC_PG_HOST:          postgres
-      ORTHANC_PG_USER:          orthanc
-      ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
-      ORTHANC_VERBOSE:          "true"
-      TZ:                       "America/New_York"
-    deploy:
-      replicas: 1
-      labels:
-      - "traefik.port=8042"
-      - "traefik.frontend.rule=PathPrefixStrip:/boost/"
+        - "traefik.frontend.rule=PathPrefixStrip:/christianson/"
 
 
   diana-watcher:
@@ -174,8 +158,8 @@ services:
     working_dir: /opt/diana
     # command: sh -c "git pull && pip install -e packages/diana && python3 /opt/diana/apps/cli/diana-watcher.py -s /ci_services.yml -c /ci_routes.yml"
     configs:
-      - siren_services.yml
-      - siren_routes.yml
+      - ci_services.yml
+      - ci_routes.yml
     environment:
       ORTHANC_PASSWORD:     ${ORTHANC_PASSWORD}
       SPLUNK_HEC_TOKEN:     ${SPLUNK_HEC_TOKEN}

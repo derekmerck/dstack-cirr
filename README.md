@@ -245,6 +245,18 @@ Increase length for `_json` sources:
 TRUNCATE = 500000
 ```
 
+## Verifying Files
+
+md5 hashes for these scripts are published on the [DIANA Hashes Gist](https://gist.github.com/derekmerck/4b0bfbca0a415655d97f36489629e1cc) as `cirr_hashes.json`.
+
+A simple hash verification utility will compare local file hashes to the public hashes:
+
+```bash
+pip install git+https://github.com/derekmerck/check-hashes
+python3 -m check-hashes verify 4b0bfbca0a415655d97f36489629e1cc cirr_hashes RIH/cirr_stack.yml
+```
+
+
 ## License
 
 MIT
