@@ -9,7 +9,7 @@ configs:
 
 secrets:
   service_password:
-    file: ./service_password.txt
+    file: ./ci_secret_password.txt
 
 services:
 
