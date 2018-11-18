@@ -6,10 +6,6 @@ splunk:
   hec_tokens:
     diana_tok: "${SPLUNK_HEC_TOKEN}"
 
-hobit:
-  host: orthanc-hobit
-  password: "${ORTHANC_PASSWORD}"
-
-boost:
-  host: orthanc-boost
+christianson:
+  host: orthanc-christianson
   password: "${ORTHANC_PASSWORD}"
