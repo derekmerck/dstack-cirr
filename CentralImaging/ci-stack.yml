@@ -7,6 +7,9 @@ configs:
   ci_routes.yml:
     file: ./ci_routes.yml
 
+  traefik.toml:
+    file: ./traefik/traefik.toml
+
 secrets:
   service_password:
     file: ./ci_secret_password.txt
@@ -34,7 +37,7 @@ services:
         constraints:
           - node.role==manager
     secrets:
-    - service_password
+      - service_password
 
 
   traefik:
@@ -44,9 +47,10 @@ services:
       - "80:80"
       - "433:433"
       - "8080:8080"
+    configs:
+      - traefik.toml
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik/traefik.toml:/traefik.toml
       - ./traefik/acme.json:/acme.json
     environment:
       TZ: "America/New_York"
