@@ -7,9 +7,6 @@ configs:
   ci_routes.yml:
     file: ./ci_routes.yml
 
-  traefik.toml:
-    file: ./traefik/traefik.toml
-
 secrets:
   service_password:
     file: ./ci_secret_password.txt
@@ -52,6 +49,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/acme.json:/acme.json
+      - ./traefik/traefik.toml:/traefik.toml
     environment:
       TZ: "America/New_York"
     deploy:
