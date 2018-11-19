@@ -46,6 +46,8 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik/traefik.toml:/traefik.toml
+      - ./traefik/acme.json:/acme.json
     environment:
       TZ: "America/New_York"
     deploy:
@@ -150,7 +152,7 @@ services:
       replicas: 1
       labels:
         - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/christianson/"
+        - "traefik.basic.frontend.rule=Host:www.central-imaging.com; PathPrefixStrip:/christianson/"
 
 
   diana-watcher:
