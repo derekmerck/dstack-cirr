@@ -44,8 +44,6 @@ services:
       - "80:80"
       - "433:433"
       - "8080:8080"
-    configs:
-      - traefik.toml
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik/acme.json:/acme.json
