@@ -18,7 +18,7 @@ defaultEntryPoints = ["https","http"]
 endpoint = "unix:///var/run/docker.sock"
 domain = "central-imaging.com"
 watch = true
-exposedByDefault = false
+# exposedByDefault = false
 
 [acme]
 email = "admin@central-imaging.com"
