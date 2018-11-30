@@ -53,8 +53,10 @@ services:
       - cirr_service_network    # for orthanc-bridge
       - admin_proxy_network     # for splunk
     configs:
-      - diana_services_01
-      - diana_routes_01
+      - source: diana_services_01
+        target: /services.yml
+      - source: diana_routes_01
+        target: /routes.yml
     environment:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       SPLUNK_HEC_TOKEN:         ${SPLUNK_HEC_TOKEN}
@@ -66,7 +68,5 @@ services:
 configs:
   diana_services_01:
     file: ./diana_services.yml
-    target: /services.yml
   diana_routes_01:
     file: ./diana_routes.yml
-    target: /routes.yml
