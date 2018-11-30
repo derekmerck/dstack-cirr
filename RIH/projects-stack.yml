@@ -11,19 +11,19 @@ networks:
 
 services:
 
-  orthanc-wbv:
+  orthanc-review-01:
     image: derekmerck/orthanc-wbv:latest-amd64
     networks:
       - cirr_service_network
       - admin_proxy_network
     environment:
-      ORTHANC_NAME:             CIRR Supplemental Review
+      ORTHANC_NAME:             CIRR Supplemental Review 1
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_WBV_ENABLED:      "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
-      ORTHANC_PG_DATABASE:      wbv1
+      ORTHANC_PG_DATABASE:      review01
       ORTHANC_PG_HOST:          postgres
       ORTHANC_PG_USER:          orthanc
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
@@ -34,7 +34,7 @@ services:
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/wbv/"
+        - "traefik.frontend.rule=PathPrefixStrip:/review01/"
       resources:
         limits:
           cpus: '0.5'
@@ -48,13 +48,13 @@ services:
   diana-indexer:
     image: derekmerck/diana
     # Comment out command to idle a connected diana container for testing
-    # command: python3 /opt/diana/apps/cli/diana-watcher.py -s /diana_services.yml -c /diana_routes.yml
+    # command: python3 /opt/diana/apps/cli/diana-cli.py -S /services.yml watch -C /routes.yml
     networks:
       - cirr_service_network    # for orthanc-bridge
       - admin_proxy_network     # for splunk
     configs:
-      - diana_services.yml
-      - diana_routes.yml
+      - diana_services_01
+      - diana_routes_01
     environment:
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       SPLUNK_HEC_TOKEN:         ${SPLUNK_HEC_TOKEN}
@@ -64,7 +64,9 @@ services:
 
 
 configs:
-  diana_services.yml:
+  diana_services_01:
     file: ./diana_services.yml
-  diana_routes.yml:
+    target: /services.yml
+  diana_routes_01:
     file: ./diana_routes.yml
+    target: /routes.yml

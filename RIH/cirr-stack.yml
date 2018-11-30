@@ -97,7 +97,7 @@ services:
       - /data/splunk:/opt/splunk/etc
     environment:
       SPLUNK_START_ARGS: "--accept-license"
-      SPLUNK_PASSWORD:  ${SPLUNK_PASSWORD}
+      SPLUNK_PASSWORD:   ${SPLUNK_PASSWORD}
       TZ: "America/New_York"
     deploy:
       replicas: 1
